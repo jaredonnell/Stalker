@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="./styles/main.css" rel="stylesheet">
+    <title>Document</title>
+</head>
+<body>
+    <div class="loader">
+        
+    </div>
+
+    <div class="opener">
+        <img src="./images/stalker_logo.png">
+    </div>
+
+    <div class="test">
+        <img src="https://quickchart.io/chart?c={type:'sparkline',data:{datasets:[{data:[<%= container %>],fill:false},{data:[<%= container2 %>],fill:false}]}}" />
+    </div>
+
+
+
+<script>
+
+    window.addEventListener('load', () => {
+
+        document.querySelector('.loader').classList.add('hide');
+
+        if (document.querySelector('.loader').classList.contains('hide')) {
+            console.log('gotcha');
+            setTimeout(() => {
+                document.querySelector('.opener').classList.add('fade-in');
+            }, 750)
+            setTimeout(() => {
+                document.querySelector('.opener').classList.remove('fade-in');
+            }, 2000);
+            setTimeout(() => {
+                document.querySelector('.opener').classList.add('hide');
+            }, 2000);
+        };
+
+     });
+
+    var test = document.querySelector('.loader').classList.contains('hide');
+    console.log(test);
+
+    
+
+
+
+</script>
+
+</body>
+</html>

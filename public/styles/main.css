@@ -1,0 +1,111 @@
+body {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.75s, visibility 0.75s;
+    z-index: 2;
+}
+
+.loader::after {
+    content: "";
+    width: 75px;
+    height: 75px;
+    border: 15px solid #dddddd;
+    border-top-color: #FFC6C6;
+    border-radius: 50%;
+    animation: spinner 1s ease infinite;
+}
+
+.hide {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.fade-in {
+    opacity: 1;
+    visibility: visible;
+}
+
+.opener {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.75s, visibility 0.75s;
+}
+
+/* .fade-in {
+    animation: fade-in .75s 2s  forwards;
+}
+
+@keyframes fade-in {
+    0% {
+        opacity: 0;
+        visibility: inherit;
+    }
+
+    50% {
+        opacity: .5;
+        visibility: visible;
+    }
+
+    100% {
+        opacity: 1;
+        visibility: visible;
+    }
+} */
+
+.opener > img {
+    visibility: hidden;
+    height: 200px;
+    width: 300px;
+    animation: show .75s;
+    animation: blink 2s ease-in-out;
+}
+
+@keyframes spinner {
+    from { transform: rotate(0turn); }
+    to { transform: rotate(1turn); }
+}
+
+
+@keyframes blink {
+    0% {
+        visibility: visible;
+        width: 300px;
+        height:0;
+    }
+    50% {
+        visibility: visible;
+        width: 300px;
+        height: 200px;
+    }
+    100% {
+        visibility: visible;
+        width:  300px;
+        height: 1px;
+    }
+}
+
+.test {
+    height: 100%;
+    width: 100%;
+}
