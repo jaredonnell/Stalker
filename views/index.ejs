@@ -11,47 +11,77 @@
 </head>
 <body>
 
-    <!--pre_cont-->
-    <div class="loader">
+    <div class="area" >
+
+        <!--pre_cont-->
+      <div class="loader">
+    
+      </div>
+    
+      <div class="opener">
+          <img src="./images/stalker_logo.png">
+      </div>
+      <!------------>
+    
+      <!-- <div class="test">
+            <img src="https://quickchart.io/chart?c={type:'sparkline',data:{datasets:    [{data:[<%= container %>],fill:false},{data:[<%= container2 %>],fill:false}]}}" />
+      </div> -->
+    
+      <section id="lander">
+    
+              <div class="nav">
+                  <div class="links jost">
+                      <a href="#features">
+                        <div class="nav-link">About Us</div>
+                      </a>
+                      <a href="#logIn">
+                        <div class="nav-link">Log In</div>
+                      </a>
+                      <a href="#signUp">
+                        <div class="nav-link">Sign Up</div>
+                      </a>
+                  </div>
+              </div>
+    
+          <div class="container">
+              <div class="text">
+                  <div class="header">
+                      <h1 class="jost-head">Stalker</h1>
+                  </div>
+                  <div class="body">
+                      <p class="jost">Stay on top of today’s market with real time and historical data on thousands of todays top stocks</p>
+                  </div>
+              </div>
+              <div class="logo">
+                  <img src="./images/stalker_logo.png">
+              </div>
+          </div>
+    
+      </section>
+    
+    
+    
+    
+    
+    
         
-    </div>
-
-    <div class="opener">
-        <img src="./images/stalker_logo.png">
-    </div>
-    <!------------>
-
-    <!-- <div class="test">
-        <img src="https://quickchart.io/chart?c={type:'sparkline',data:{datasets:[{data:[<%= container %>],fill:false},{data:[<%= container2 %>],fill:false}]}}" />
-    </div> -->
-
-    <section id="lander">
-
-            <div class="nav">
-                <div class="links jost">
-                    <div><a href="#features">About Us</a></div>
-                    <div><a href="#logIn">Log In</a></div>
-                    <div><a href="#signUp">Sign Up</a></div>
-                </div>
-            </div>
-
-        <div class="container">
-            <div class="text">
-                <div class="header">
-                    <h1 class="jost-head">Stalker</h1>
-                </div>
-                <div class="body">
-                    <p class="jost">Stay on top of today’s market with real time and historical data on thousands of todays top stocks</p>
-                </div>
-            </div>
-            <div class="logo">
-                <img src="./images/stalker_logo.png">
-            </div>
-        </div>
-
-    </section>
+            <ul class="circles">
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+            </ul>
+      </div >
 
 <script>
+
+    /* pre load timings */
 
     window.addEventListener('load', () => {
         setTimeout(() =>{
@@ -74,7 +104,30 @@
 
         }, 750);
 
-     });
+    });
+
+    /* nav-shower */
+
+     function showLinks () {
+        let links = document.querySelectorAll('.nav-link');
+        links.forEach((link) => {
+            link.classList.add('show-link')
+        });
+     };
+
+     setTimeout(() => {
+
+        if (document.querySelector('.opener').classList.contains('hide')) {
+            document.querySelector('.nav').classList.add('show-link');
+            showLinks();
+        };
+
+     }, 2000);
+     
+
+     console.log(document.querySelectorAll('.nav-link'))
+
+
 
 </script>
 
