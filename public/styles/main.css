@@ -1,9 +1,23 @@
 body {
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    height: 100%;
+    margin: 0;
 }
+
+.jost-head {
+  font-family: "Jost", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 900;
+  font-style: italic;
+}
+
+.jost {
+  font-family: "Jost", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 450;
+  font-style: normal;
+}
+
+/* pre content */
 
 .loader {
     position: fixed;
@@ -52,27 +66,6 @@ body {
     transition: opacity 0.75s, visibility 0.75s;
 }
 
-/* .fade-in {
-    animation: fade-in .75s 2s  forwards;
-}
-
-@keyframes fade-in {
-    0% {
-        opacity: 0;
-        visibility: inherit;
-    }
-
-    50% {
-        opacity: .5;
-        visibility: visible;
-    }
-
-    100% {
-        opacity: 1;
-        visibility: visible;
-    }
-} */
-
 .opener > img {
     visibility: hidden;
     height: 200px;
@@ -105,7 +98,97 @@ body {
     }
 }
 
-.test {
+/* lander-nav */
+
+#lander {
+    height: 100dvh;
+}
+
+.nav {
+    height: 10%;
+    width: 100vw;
+    background-color: #ffc6c6b1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.nav:hover {
+    background-color: #FFC6C6;
+}
+
+.links {
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 15px;
+}
+
+.links a {
     height: 100%;
     width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    color: white;
+    margin: 0 50px;
+    font-size: 24pt;
 }
+
+.links > div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 15px;
+}
+
+.links > div:hover {
+    background-color: #ffb3b3;
+}
+
+/* lander */
+
+#lander > .container {
+    height: 90%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+}
+
+.text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+h1 {
+    font-size: 8rem;
+    color: #FFC6C6;
+    margin: 0;
+}
+
+.header {
+    height: fit-content;
+}
+
+.body {
+    padding: 0 50px;
+    text-align: center;
+    font-size: 3rem;
+    color:#FFC6C6
+}
+
+.logo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo > img {
+    height: 350px;
+    width: 500px;
+}
+

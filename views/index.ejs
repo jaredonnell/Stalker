@@ -3,10 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <link href="./styles/main.css" rel="stylesheet">
     <title>Document</title>
 </head>
 <body>
+
+    <!--pre_cont-->
     <div class="loader">
         
     </div>
@@ -14,12 +19,37 @@
     <div class="opener">
         <img src="./images/stalker_logo.png">
     </div>
+    <!------------>
 
-    <div class="test">
+    <!-- <div class="test">
         <img src="https://quickchart.io/chart?c={type:'sparkline',data:{datasets:[{data:[<%= container %>],fill:false},{data:[<%= container2 %>],fill:false}]}}" />
-    </div>
+    </div> -->
 
+    <section id="lander">
 
+            <div class="nav">
+                <div class="links jost">
+                    <div><a href="#features">About Us</a></div>
+                    <div><a href="#logIn">Log In</a></div>
+                    <div><a href="#signUp">Sign Up</a></div>
+                </div>
+            </div>
+
+        <div class="container">
+            <div class="text">
+                <div class="header">
+                    <h1 class="jost-head">Stalker</h1>
+                </div>
+                <div class="body">
+                    <p class="jost">Stay on top of today’s market with real time and historical data on thousands of todays top stocks</p>
+                </div>
+            </div>
+            <div class="logo">
+                <img src="./images/stalker_logo.png">
+            </div>
+        </div>
+
+    </section>
 
 <script>
 
@@ -37,17 +67,10 @@
             }, 2000);
             setTimeout(() => {
                 document.querySelector('.opener').classList.add('hide');
-            }, 2000);
+            }, 1000);
         };
 
      });
-
-    var test = document.querySelector('.loader').classList.contains('hide');
-    console.log(test);
-
-    
-
-
 
 </script>
 
