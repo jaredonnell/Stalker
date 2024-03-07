@@ -1,5 +1,9 @@
 * {
-    overflow: hidden;
+    overflow-x: hidden;
+}
+
+html {
+    scroll-behavior: smooth;
 }
 
 body {
@@ -109,13 +113,12 @@ body {
     background: #121212;  
     background: -webkit-linear-gradient(to left, #222020, #050505);  
     width: 100%;
-    height:100vh;
     z-index: -1;
 
 }
 
 .circles{
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
@@ -324,3 +327,74 @@ h1 {
     width: 500px;
 }
 
+/* features */
+
+#features {
+    height: 100dvh;
+    width: 100vw;
+    background: transparent;
+}
+
+#features > .header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 10%;
+    width: 100vw;
+    margin-top: 15px;
+}
+
+#features h2 {
+    text-align: center;
+    font-size: 3rem;
+    color:#FFC6C6;
+}
+
+#features > .wrapper {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#features .container {
+    height: 90%;
+    width: 95vw;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr;
+    align-content: center;
+    gap: 20px;
+}
+
+.feature {
+    min-height: 600px;
+    border-radius: 15px;
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    color:#FFC6C6
+}
+
+
+.icon {
+    padding: 10px;
+    padding-right: 20px;
+    float: left;
+}
+
+.icon > img {
+    height: 75px;
+    width: 75px;
+    overflow: hidden;
+}
+
+.f-title {
+    font-size: 2.25rem;
+    text-decoration: underline;
+}
+
+.feature > .bottom {
+    padding: 0 15px;
+    font-size: 2rem;
+}
