@@ -54,21 +54,25 @@
 <script>
 
     window.addEventListener('load', () => {
+        setTimeout(() =>{
+            document.querySelector('.loader').classList.add('hide');
+        }, 500);
 
-        document.querySelector('.loader').classList.add('hide');
-
-        if (document.querySelector('.loader').classList.contains('hide')) {
+        setTimeout(() =>{
+            if (document.querySelector('.loader').classList.contains('hide')) {
             console.log('gotcha');
             setTimeout(() => {
                 document.querySelector('.opener').classList.add('fade-in');
             }, 750)
             setTimeout(() => {
                 document.querySelector('.opener').classList.remove('fade-in');
-            }, 2000);
+            }, 1000);
             setTimeout(() => {
                 document.querySelector('.opener').classList.add('hide');
             }, 1000);
         };
+
+        }, 750);
 
      });
 
