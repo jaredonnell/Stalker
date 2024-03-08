@@ -63,6 +63,34 @@
               </div>
     
           <div class="container">
+            <% if (locals.username && name_taken == false) { %>
+                <div class="text" style="position: absolute;">
+                    <div class="header">
+                        <h1 class="jost-head">Congrats!</h1>
+                    </div>
+                    <div class="body">
+                        <p class="jost">Congragulations <%= username %>. Login to your new account and start searching!</p>
+                    </div>
+                </div>
+          <% } else if (locals.username && name_taken == true) { %>
+            <div class="text" style="position: absolute;">
+                <div class="header">
+                    <h1 class="jost-head">Try Again</h1>
+                </div>
+                <div class="body">
+                    <p class="jost">Username '<%= username %>' has already been taken. Please use a different username for your account</p>
+                </div>
+            </div>
+         <% } else if (locals.check == false) { %>
+            <div class="text" style="position: absolute;">
+                <div class="header">
+                    <h1 class="jost-head">Try Again</h1>
+                </div>
+                <div class="body">
+                    <p class="jost">Incorrect passowrd or login. Please try agsin!</p>
+                </div>
+            </div>
+         <% } else { %>
               <div class="text">
                   <div class="header">
                       <h1 class="jost-head">Stalker</h1>
@@ -74,6 +102,7 @@
               <div class="logo">
                   <img src="./images/stalker_logo.png">
               </div>
+         <% } %>
           </div>
     
       </section>
@@ -187,14 +216,10 @@
 
                 <h2 class="jost-head">Sign Up Now!</h2>
 
-                <% if ( name_taken === true) { %>
-                    <h3 class="jost"><%= error %></h3>
-               <% } %>
-
                 <form action="/sign-up" method="POST">
 
-                    <input type="text" name="username" placeholder="Username" required>
-                    <input type="text" name="password" placeholder="Password" required>
+                    <input type="text" name="new_username" placeholder="Username" required>
+                    <input type="text" name="new_password" placeholder="Password" required>
                     <input class="honey" type="text" name="honey">
                     <button type="submit" class="jost sub">Sign Up</button>
 
