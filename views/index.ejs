@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <link href="./styles/main.css" rel="stylesheet">
-    <title>Document</title>
+    <title>Stalker</title>
 </head>
 <body>
 
@@ -34,13 +34,34 @@
                       <a href="#features">
                         <div class="nav-link">About Us</div>
                       </a>
-                      <a href="#logIn">
+                      <a data-login-target="#login">
                         <div class="nav-link">Log In</div>
                       </a>
                       <a href="#signUp">
                         <div class="nav-link">Sign Up</div>
                       </a>
                   </div>
+
+                  <div class="login" id="login">
+
+                    <div class="container">
+
+                        <div class="l-header">
+                            <h2 class="jost-head">Welcome Back</h2>
+                        </div>
+
+                        <form action="/login" method="POST">
+                            <input type="text" class="jost" name="email" placeholder="Email" required>
+                            <input type="text" class="jost" name="password" placeholder="Password" required>
+                            <button type="submit" class="jost">Login</button>
+                        </form>
+
+                    </div>
+
+                  </div>
+
+                  <div id="overlay" class="inactive"></div>
+
               </div>
     
           <div class="container">
@@ -160,7 +181,42 @@
 
       </section>
     
-    
+      <section id="signUp">
+
+        <div class="container">
+
+            <div class="signUp">
+
+                <h2 class="jost-head">Sign Up Now!</h2>
+
+                <form action="/sign-up" method="POST">
+
+                    <input type="text" name="email" placeholder="Email" required>
+                    <input type="text" name="password" placeholder="Password" required>
+                    <input class="honey" type="text" name="honey">
+                    <button type="submit" class="jost sub">Sign Up</button>
+
+                </form>
+
+                <div class="backToTop jost">
+
+                    <a href="#lander">Already have an account? Click here</a>
+
+                </div>
+
+            </div>
+
+            <div class="text">
+
+                <h3 class="jost">Create your free account and start browsing in seconds!</h3>
+
+            </div>
+
+        </div>
+
+        
+
+      </section>
     
     
     
@@ -219,16 +275,63 @@
      setTimeout(() => {
 
         if (document.querySelector('.opener').classList.contains('hide')) {
+
                 document.querySelector('.nav').classList.add('show-link');
+
                 showLinks();
+
+                document.querySelector('form').classList.add('show-link');
+
+                document.querySelector('.backToTop').classList.add('show-link');
+
+                document.querySelector('button').classList.add('show-link')
+
+                document.querySelector('.sub').classList.add('show-link')
+
+                document.querySelectorAll('input').forEach((input) => {
+                    input.classList.add('show-link');
+                })
+
             };
 
      }, 2000);
+
+     /* pop-up */
+
+     const login = document.querySelector('[data-login-target]');
+     const pop_up = document.querySelector(login.dataset.loginTarget);
+     const overlay = document.querySelector('#overlay');
+
+     login.addEventListener('click', () => {
+
+        pop_up.classList.add('scale');
+
+        if (pop_up.classList.contains('scale')) {
+
+            overlay.classList.remove('inactive');
+
+            overlay.classList.add('active');
+
+            overlay.addEventListener('click', () => {
+
+                pop_up.classList.remove('scale');
+
+                setTimeout(() => {
+
+                    if (pop_up.classList.contains('scale') == false) {
+
+                        overlay.classList.remove('active');
+                        overlay.classList.add('inactive');
+
+                    };
+
+                }, 200);
+
+            });
+
+        }
      
-
-     console.log(document.querySelectorAll('.nav-link'))
-
-
+     });
 
 </script>
 
