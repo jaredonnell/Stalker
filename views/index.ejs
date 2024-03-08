@@ -1,366 +1,328 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <link href="./styles/main.css" rel="stylesheet">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link href="./styles/main.css" rel="stylesheet" />
     <title>Stalker</title>
-</head>
-<body>
-
-    <div class="area" >
-
+  </head>
+  <body>
+    <div class="area">
       <!--pre_cont-->
 
-      <div class="loader">
-    
-      </div>
-    
+      <div class="loader"></div>
+
       <div class="opener">
-          <img src="./images/stalker_logo.png">
+        <img src="./images/stalker_logo.png" />
       </div>
 
       <!------------>
-    
+
       <section id="lander">
-    
-              <div class="nav">
-                  <div class="links jost">
-                      <a href="#features">
-                        <div class="nav-link">About Us</div>
-                      </a>
-                      <a data-login-target="#login">
-                        <div class="nav-link">Log In</div>
-                      </a>
-                      <a href="#signUp">
-                        <div class="nav-link">Sign Up</div>
-                      </a>
-                  </div>
-
-                  <div class="login" id="login">
-
-                    <div class="container">
-
-                        <div class="l-header">
-                            <h2 class="jost-head">Welcome Back</h2>
-                        </div>
-
-                        <form action="/login" method="POST">
-                            <input type="text" class="jost" name="username" placeholder="Username" required>
-                            <input type="text" class="jost" name="password" placeholder="Password" required>
-                            <button type="submit" class="jost">Login</button>
-                        </form>
-
-                    </div>
-
-                  </div>
-
-                  <div id="overlay" class="inactive"></div>
-
-              </div>
-    
-          <div class="container">
-            <% if (locals.username && name_taken == false) { %>
-                <div class="text" style="position: absolute;">
-                    <div class="header">
-                        <h1 class="jost-head">Congrats!</h1>
-                    </div>
-                    <div class="body">
-                        <p class="jost">Congragulations <%= username %>. Login to your new account and start searching!</p>
-                    </div>
-                </div>
-          <% } else if (locals.username && name_taken == true) { %>
-            <div class="text" style="position: absolute;">
-                <div class="header">
-                    <h1 class="jost-head">Try Again</h1>
-                </div>
-                <div class="body">
-                    <p class="jost">Username '<%= username %>' has already been taken. Please use a different username for your account</p>
-                </div>
-            </div>
-         <% } else if (locals.check == false) { %>
-            <div class="text" style="position: absolute;">
-                <div class="header">
-                    <h1 class="jost-head">Try Again</h1>
-                </div>
-                <div class="body">
-                    <p class="jost">Incorrect passowrd or login. Please try agsin!</p>
-                </div>
-            </div>
-         <% } else { %>
-              <div class="text">
-                  <div class="header">
-                      <h1 class="jost-head">Stalker</h1>
-                  </div>
-                  <div class="body">
-                      <p class="jost">Stay on top of today’s market with real time and historical data on thousands of todays top stocks</p>
-                  </div>
-              </div>
-              <div class="logo">
-                  <img src="./images/stalker_logo.png">
-              </div>
-         <% } %>
+        <div class="nav">
+          <div class="links jost">
+            <a href="#features">
+              <div class="nav-link">About Us</div>
+            </a>
+            <a data-login-target="#login">
+              <div class="nav-link">Log In</div>
+            </a>
+            <a href="#signUp">
+              <div class="nav-link">Sign Up</div>
+            </a>
           </div>
-    
+
+          <div class="login" id="login">
+            <div class="container">
+              <div class="l-header">
+                <h2 class="jost-head">Welcome Back</h2>
+              </div>
+
+              <form action="/login" method="POST">
+                <input
+                  type="text"
+                  class="jost"
+                  name="username"
+                  placeholder="Username"
+                  required
+                />
+                <input
+                  type="text"
+                  class="jost"
+                  name="password"
+                  placeholder="Password"
+                  required
+                />
+                <button type="submit" class="jost">Login</button>
+              </form>
+            </div>
+          </div>
+
+          <div id="overlay" class="inactive"></div>
+        </div>
+
+        <div class="container">
+          <% if (locals.username && name_taken == false) { %>
+          <div class="text" style="position: absolute">
+            <div class="header">
+              <h1 class="jost-head">Congrats!</h1>
+            </div>
+            <div class="body">
+              <p class="jost">
+                Congragulations <%= username %>. Login to your new account and
+                start searching!
+              </p>
+            </div>
+          </div>
+          <% } else if (locals.username && name_taken == true) { %>
+          <div class="text" style="position: absolute">
+            <div class="header">
+              <h1 class="jost-head">Try Again</h1>
+            </div>
+            <div class="body">
+              <p class="jost">
+                Username '<%= username %>' has already been taken. Please use a
+                different username for your account
+              </p>
+            </div>
+          </div>
+          <% } else if (locals.check == false) { %>
+          <div class="text" style="position: absolute">
+            <div class="header">
+              <h1 class="jost-head">Try Again</h1>
+            </div>
+            <div class="body">
+              <p class="jost">Incorrect passowrd or login. Please try agsin!</p>
+            </div>
+          </div>
+          <% } else { %>
+          <div class="text">
+            <div class="header">
+              <h1 class="jost-head">Stalker</h1>
+            </div>
+            <div class="body">
+              <p class="jost">
+                Stay on top of today’s market with real time and historical data
+                on thousands of todays top stocks
+              </p>
+            </div>
+          </div>
+          <div class="logo">
+            <img src="./images/stalker_logo.png" />
+          </div>
+          <% } %>
+        </div>
       </section>
 
       <section id="features">
-
         <div class="header">
-
-            <h2 class="jost-head">Features</h2>
-
+          <h2 class="jost-head">Features</h2>
         </div>
 
         <div class="wrapper">
-
-            <div class="container">
-
+          <div class="container">
             <div class="feature">
-
-                <div class="top">
-
-                    <div class="icon">
-                        <img src="./images/person_icon.png">
-                    </div>
-
-                    <div class="f-title">
-                        <h3 class="jost">Personalization</h3>
-                    </div>
-
+              <div class="top">
+                <div class="icon">
+                  <img src="./images/person_icon.png" />
                 </div>
 
-                <div class="bottom">
-
-                    <div class="content">
-                        <p class="jost">
-                            Customize your profile to suit your monitoring needs. Save different stocks for quick access and filter your results so you only see what you want to see.
-                        </p>
-                    </div>
-
+                <div class="f-title">
+                  <h3 class="jost">Personalization</h3>
                 </div>
+              </div>
 
+              <div class="bottom">
+                <div class="content">
+                  <p class="jost">
+                    Customize your profile to suit your monitoring needs. Save
+                    different stocks for quick access and filter your results so
+                    you only see what you want to see.
+                  </p>
+                </div>
+              </div>
             </div>
 
             <div class="feature">
-
-                <div class="top">
-
-                    <div class="icon">
-                        <img src="./images/stock_icon.png">
-                    </div>
-
-                    <div class="f-title">
-                        <h3 class="jost">Real Time Data</h3>
-                    </div>
-
+              <div class="top">
+                <div class="icon">
+                  <img src="./images/stock_icon.png" />
                 </div>
 
-                <div class="bottom">
-
-                    <div class="content">
-
-                        <p class="jost">
-                            Access to detailed information on the stocks you want to see. Including thousands of ETFs, Cryptocurrencies, Index funds and more.
-                        </p>
-
-                    </div>
-
+                <div class="f-title">
+                  <h3 class="jost">Real Time Data</h3>
                 </div>
+              </div>
 
+              <div class="bottom">
+                <div class="content">
+                  <p class="jost">
+                    Access to detailed information on the stocks you want to
+                    see. Including thousands of ETFs, Cryptocurrencies, Index
+                    funds and more.
+                  </p>
+                </div>
+              </div>
             </div>
 
             <div class="feature">
-
-                <div class="top">
-
-                    <div class="icon">
-                        <img src="./images/money_icon.png">
-                    </div>
-
-                    <div class="f-title">
-                        <h3 class="jost">Completely Free</h3>
-                    </div>
-
+              <div class="top">
+                <div class="icon">
+                  <img src="./images/money_icon.png" />
                 </div>
 
-                <div class="bottom">
-
-                    <div class="content">
-
-                        <p class="jost">
-                            Get access to all this information for absolutely no cost to you! No ads, no promotions, just content.
-                        </p>
-
-                    </div>
-
+                <div class="f-title">
+                  <h3 class="jost">Completely Free</h3>
                 </div>
+              </div>
 
+              <div class="bottom">
+                <div class="content">
+                  <p class="jost">
+                    Get access to all this information for absolutely no cost to
+                    you! No ads, no promotions, just content.
+                  </p>
+                </div>
+              </div>
             </div>
+          </div>
+        </div>
+      </section>
 
+      <section id="signUp">
+        <div class="container">
+          <div class="signUp">
+            <h2 class="jost-head">Sign Up Now!</h2>
+
+            <form action="/sign-up" method="POST">
+              <input
+                type="text"
+                name="new_username"
+                placeholder="Username"
+                required
+              />
+              <input
+                type="text"
+                name="new_password"
+                placeholder="Password"
+                required
+              />
+              <input class="honey" type="text" name="honey" />
+              <button type="submit" class="jost sub">Sign Up</button>
+            </form>
+
+            <div class="backToTop jost">
+              <a href="#lander">Already have an account? Click here</a>
+            </div>
           </div>
 
+          <div class="text">
+            <h3 class="jost">
+              Create your free account and start browsing in seconds!
+            </h3>
+          </div>
         </div>
-        
-
       </section>
-    
-      <section id="signUp">
 
-        <div class="container">
+      <ul class="circles">
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+      </ul>
+    </div>
 
-            <div class="signUp">
+    <script>
+      /* pre load timings */
 
-                <h2 class="jost-head">Sign Up Now!</h2>
-
-                <form action="/sign-up" method="POST">
-
-                    <input type="text" name="new_username" placeholder="Username" required>
-                    <input type="text" name="new_password" placeholder="Password" required>
-                    <input class="honey" type="text" name="honey">
-                    <button type="submit" class="jost sub">Sign Up</button>
-
-                </form>
-
-                <div class="backToTop jost">
-
-                    <a href="#lander">Already have an account? Click here</a>
-
-                </div>
-
-            </div>
-
-            <div class="text">
-
-                <h3 class="jost">Create your free account and start browsing in seconds!</h3>
-
-            </div>
-
-        </div>
-
-        
-
-      </section>
-    
-    
-    
-    
-        
-            <ul class="circles">
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-            </ul>
-    </div >
-
-<script>
-
-    /* pre load timings */
-
-    window.addEventListener('load', () => {
-        setTimeout(() =>{
-            document.querySelector('.loader').classList.add('hide');
+      window.addEventListener("load", () => {
+        setTimeout(() => {
+          document.querySelector(".loader").classList.add("hide");
         }, 500);
 
-        setTimeout(() =>{
-            if (document.querySelector('.loader').classList.contains('hide')) {
-            console.log('gotcha');
+        setTimeout(() => {
+          if (document.querySelector(".loader").classList.contains("hide")) {
+            console.log("gotcha");
             setTimeout(() => {
-                document.querySelector('.opener').classList.add('fade-in');
-            }, 750)
+              document.querySelector(".opener").classList.add("fade-in");
+            }, 750);
             setTimeout(() => {
-                document.querySelector('.opener').classList.remove('fade-in');
+              document.querySelector(".opener").classList.remove("fade-in");
             }, 1000);
             setTimeout(() => {
-                document.querySelector('.opener').classList.add('hide');
+              document.querySelector(".opener").classList.add("hide");
             }, 1000);
-        };
-
+          }
         }, 750);
+      });
 
-    });
+      /* nav-shower */
 
-    /* nav-shower */
-
-     function showLinks () {
-        let links = document.querySelectorAll('.nav-link');
+      function showLinks() {
+        let links = document.querySelectorAll(".nav-link");
         links.forEach((link) => {
-            link.classList.add('show-link')
+          link.classList.add("show-link");
         });
-     };
+      }
 
-     setTimeout(() => {
+      setTimeout(() => {
+        if (document.querySelector(".opener").classList.contains("hide")) {
+          document.querySelector(".nav").classList.add("show-link");
 
-        if (document.querySelector('.opener').classList.contains('hide')) {
+          showLinks();
 
-                document.querySelector('.nav').classList.add('show-link');
+          document.querySelector("form").classList.add("show-link");
 
-                showLinks();
+          document.querySelector(".backToTop").classList.add("show-link");
 
-                document.querySelector('form').classList.add('show-link');
+          document.querySelector("button").classList.add("show-link");
 
-                document.querySelector('.backToTop').classList.add('show-link');
+          document.querySelector(".sub").classList.add("show-link");
 
-                document.querySelector('button').classList.add('show-link')
-
-                document.querySelector('.sub').classList.add('show-link')
-
-                document.querySelectorAll('input').forEach((input) => {
-                    input.classList.add('show-link');
-                })
-
-            };
-
-     }, 2000);
-
-     /* pop-up */
-
-     const login = document.querySelector('[data-login-target]');
-     const pop_up = document.querySelector(login.dataset.loginTarget);
-     const overlay = document.querySelector('#overlay');
-
-     login.addEventListener('click', () => {
-
-        pop_up.classList.add('scale');
-
-        if (pop_up.classList.contains('scale')) {
-
-            overlay.classList.remove('inactive');
-
-            overlay.classList.add('active');
-
-            overlay.addEventListener('click', () => {
-
-                pop_up.classList.remove('scale');
-
-                setTimeout(() => {
-
-                    if (pop_up.classList.contains('scale') == false) {
-
-                        overlay.classList.remove('active');
-                        overlay.classList.add('inactive');
-
-                    };
-
-                }, 200);
-
-            });
-
+          document.querySelectorAll("input").forEach((input) => {
+            input.classList.add("show-link");
+          });
         }
-     
-     });
+      }, 2000);
 
-</script>
+      /* pop-up */
 
-</body>
+      const login = document.querySelector("[data-login-target]");
+      const pop_up = document.querySelector(login.dataset.loginTarget);
+      const overlay = document.querySelector("#overlay");
+
+      login.addEventListener("click", () => {
+        pop_up.classList.add("scale");
+
+        if (pop_up.classList.contains("scale")) {
+          overlay.classList.remove("inactive");
+
+          overlay.classList.add("active");
+
+          overlay.addEventListener("click", () => {
+            pop_up.classList.remove("scale");
+
+            setTimeout(() => {
+              if (pop_up.classList.contains("scale") == false) {
+                overlay.classList.remove("active");
+                overlay.classList.add("inactive");
+              }
+            }, 200);
+          });
+        }
+      });
+    </script>
+  </body>
 </html>

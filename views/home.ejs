@@ -1,80 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <link href="./styles/home.css" rel="stylesheet">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link href="./styles/home.css" rel="stylesheet" />
     <title>User Profile</title>
-</head>
-<body>
-
+  </head>
+  <body>
     <!--pre-cont-->
 
-    <div class="loader">
-    
-    </div>
-  
+    <div class="loader"></div>
+
     <div class="opener">
-        <img src="./images/stalker_logo.png">
+      <img src="./images/stalker_logo.png" />
     </div>
 
     <!------------->
 
-    <div class="area" style='height: 100dvh;'>
-
-
-
-
-
-
-
-        <ul class="circles">
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-        </ul>
-
+    <div class="area" style="height: 100dvh">
+      <ul class="circles">
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+      </ul>
     </div>
 
     <script>
+      /* pre load */
 
-    /* pre load */
-
-        window.addEventListener('load', () => {
-        setTimeout(() =>{
-            document.querySelector('.loader').classList.add('hide');
+      window.addEventListener("load", () => {
+        setTimeout(() => {
+          document.querySelector(".loader").classList.add("hide");
         }, 1000);
 
-        setTimeout(() =>{
-            if (document.querySelector('.loader').classList.contains('hide')) {
-            console.log('gotcha');
+        setTimeout(() => {
+          if (document.querySelector(".loader").classList.contains("hide")) {
+            console.log("gotcha");
             setTimeout(() => {
-                document.querySelector('.opener').classList.add('fade-in');
-            }, 1000)
+              document.querySelector(".opener").classList.add("fade-in");
+            }, 1000);
             setTimeout(() => {
-                document.querySelector('.opener').classList.remove('fade-in');
+              document.querySelector(".opener").classList.remove("fade-in");
             }, 1250);
             setTimeout(() => {
-                document.querySelector('.opener').classList.add('hide');
+              document.querySelector(".opener").classList.add("hide");
             }, 1250);
-        };
-
+          }
         }, 1000);
+      });
 
-    });
-
-    /*          */
-
+      /*          */
     </script>
-</body>
+  </body>
 </html>

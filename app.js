@@ -1,7 +1,7 @@
 import express from "express";
-import pg from 'pg';
-import axios from 'axios';
-import bodyParser from 'body-parser'
+import pg from "pg";
+import axios from "axios";
+import bodyParser from "body-parser";
 
 const app = express();
 const port = 3000;
@@ -15,12 +15,12 @@ const port = 3000;
 // }
 
 const db = new pg.Client({
-    user: "postgres",
-    host: "localhost",
-    database: "stalker",
-    password: "JDjd28690406$$",
-    port: 5432,
-  });
+  user: "postgres",
+  host: "localhost",
+  database: "stalker",
+  password: "JDjd28690406$$",
+  port: 5432,
+});
 
 let name_taken = true;
 let check = true;
@@ -30,13 +30,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
 app.get("/", async (req, res) => {
-
-  res.render('index.ejs', { name_taken: name_taken });
-
+  res.render("index.ejs", { name_taken: name_taken });
 });
 
-app.post('/sign-up', async (req, res) => {
-
+app.post("/sign-up", async (req, res) => {
   const db = new pg.Client({
     user: "postgres",
     host: "localhost",
@@ -56,25 +53,25 @@ app.post('/sign-up', async (req, res) => {
   });
 
   if (!current_users.includes(req.body.new_username)) {
-    name_taken = false
+    name_taken = false;
   }
 
   if (name_taken == false) {
-
-    await db.query(
-      "INSERT INTO auth (username, password) VALUES ($1, $2)", [req.body.new_username, req.body.new_password]
-    );
-
+    await db.query("INSERT INTO auth (username, password) VALUES ($1, $2)", [
+      req.body.new_username,
+      req.body.new_password,
+    ]);
   }
 
   db.end();
-  
-  res.render('index.ejs', { name_taken: name_taken, username: req.body.new_username });
 
+  res.render("index.ejs", {
+    name_taken: name_taken,
+    username: req.body.new_username,
+  });
 });
 
-app.post('/login', async (req, res) => {
-
+app.post("/login", async (req, res) => {
   const db = new pg.Client({
     user: "postgres",
     host: "localhost",
@@ -85,18 +82,17 @@ app.post('/login', async (req, res) => {
 
   db.connect();
 
-  const user = await db.query(
-      "SELECT * FROM auth WHERE username = $1", [req.body.username]
-    );
+  const user = await db.query("SELECT * FROM auth WHERE username = $1", [
+    req.body.username,
+  ]);
 
-  let exists = false
-  
+  let exists = false;
+
   db.end();
 
   console.log(user.rows[0].password);
 
   if (user.rows[0].password == req.body.password) {
-
     const db = new pg.Client({
       user: "postgres",
       host: "localhost",
@@ -104,45 +100,39 @@ app.post('/login', async (req, res) => {
       password: "JDjd28690406$$",
       port: 5432,
     });
-  
+
     db.connect();
 
-    const user_check = await db.query(
-      "SELECT * FROM profile"
-    )
+    const user_check = await db.query("SELECT * FROM profile");
 
     console.log(user_check.rows[1]);
 
     for (let i = 0; i < user_check.rows.length; i++) {
-
       if (user_check.rows[i].username.includes(req.body.username)) {
-        exists = true
+        exists = true;
       }
-
-      
-    };
+    }
 
     if (exists === true) {
-      res.render('home.ejs', {user: user});
+      res.render("home.ejs", { user: user });
     } else {
-      await db.query(
-        "INSERT INTO profile (username) VALUES ($1)", [req.body.username]
-      );
-      res.render('home.ejs');
+      await db.query("INSERT INTO profile (username) VALUES ($1)", [
+        req.body.username,
+      ]);
+      res.render("home.ejs");
     }
-    
+  } else {
+    check = false;
 
-    } else {
-
-      check = false;
-
-      res.render('index.ejs', { name_taken: name_taken, check: check, username: req.body.new_username});
-
-    }
-    db.end();
+    res.render("index.ejs", {
+      name_taken: name_taken,
+      check: check,
+      username: req.body.new_username,
+    });
+  }
+  db.end();
 });
 
 app.listen(3000, () => {
-    console.log(`Server running on port ${port}.`);
+  console.log(`Server running on port ${port}.`);
 });
-
