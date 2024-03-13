@@ -25,6 +25,41 @@
 
     <div class="area">
 
+      <!--Setup-->
+
+      <% if (setup === true) { %>
+        <div class="q-container">
+          <div class="prompt">
+
+          </div>
+          <div class="setup_form">
+            <form action="/user-setup">
+              <p>How should we refer to you?</p>
+              <input type="text" name="name" placeholder="Name" required>
+              <p>What are you most interested in?</p>
+              <div class="stock_options">
+                <div class="option"><input type="button" value="Crypto"></div>
+                <div class="option"><input type="button" value="Forex"></div>
+                <div class="option"><input type="button" value="ETFs"></div>
+                <div class="option"><input type="button" value="Index"></div>
+              </div>
+              <input type="submit" value="Submit">
+            </form>
+          </div>
+        </div>
+      <% } else { %>
+      <!--User Greet-->
+
+      <div class="greet-container">
+        <div class="greet">
+          <div class="first jost-head">Welcome,</div><div class="second jost-head"><%= profile.rows[0].username %></div>
+        </div>
+        <div class="block"></div>
+      </div>
+      <% } %>
+
+      
+
       
 
       <ul class="circles">
@@ -47,25 +82,35 @@
       window.addEventListener("load", () => {
         setTimeout(() => {
           document.querySelector(".loader").classList.add("hide");
-        }, 1000);
+        }, 700);
 
         setTimeout(() => {
           if (document.querySelector(".loader").classList.contains("hide")) {
             console.log("gotcha");
             setTimeout(() => {
               document.querySelector(".opener").classList.add("fade-in");
-            }, 1000);
+            }, 500);
             setTimeout(() => {
               document.querySelector(".opener").classList.remove("fade-in");
-            }, 1250);
+            }, 750);
             setTimeout(() => {
               document.querySelector(".opener").classList.add("hide");
+              
             }, 1250);
+            document.querySelector('.first').classList.add('first-ani');
+            document.querySelector('.second').classList.add('second-ani');
           }
-        }, 1000);
+        }, 1250);
       });
 
-      /*          */
+      /*  pre-qs  */
+      
+      setTimeout(() => {
+        if (document.querySelector('.first').classList.contains('first-ani')) {
+          document.querySelector('.greet-container').classList.add('hide');
+        }
+      }, 4000);
+
     </script>
   </body>
 </html>

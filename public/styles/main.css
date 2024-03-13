@@ -77,8 +77,8 @@ body {
 
 .opener > img {
     visibility: hidden;
-    height: 200px;
-    width: 300px;
+    max-height: 200px;
+    max-width: 300px;
     animation: show .75s;
     animation: blink 2s ease-in-out;
 }
@@ -267,7 +267,6 @@ body {
 }
 
 .links > div {
-    border-radius: 15px;
     transition: all .5s;
     text-align: center;
 }
@@ -384,8 +383,8 @@ h1 {
 }
 
 .logo > img {
-    height: 350px;
-    width: 500px;
+    max-height: 350px;
+    max-width: 500px;
 }
 
 /* features */
@@ -565,4 +564,122 @@ form > button:hover::before {
 
 .backToTop > a:hover {
     color: white;
+}
+
+/* Responsive */
+
+@media (max-width: 430px) {
+
+    /* nav */
+
+    .links > a {
+        font-size: 16pt;
+        width: 100%;
+    }
+
+    /* pop-up */
+
+    .l-header {
+        font-size: 1.5rem;
+    }
+
+    /* lander */
+
+    #lander > .container {
+        grid-template-columns: 100%;
+        grid-template-rows: 1fr 2fr;
+    }
+
+    #lander > .container .body {
+        padding: 0 15px;
+        font-size: 1.75rem;
+    }
+
+    .text {
+        align-items: center;
+        width: 100%;
+        grid-area: 2 / 1 / 2 / 1;
+        align-self: start;
+        padding-top: 10%
+    }
+
+    .header > h1 {
+        font-size: 5.5rem;
+    }
+
+    .logo {
+        height: 150px;
+        width: 300px;
+        padding-left: 10px;
+        grid-area: 1 / 1 / 1 / 1;
+        overflow: hidden;
+        flex-direction: row;
+        justify-self: center;
+        align-self: end;
+    }
+
+    /* features */
+
+    #features > .wrapper > .container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .feature {
+        min-height: auto;
+    }
+
+    .icon > img {
+        height: 50px;
+        width: 50px;
+    }
+
+    .f-title {
+        font-size: 1.75rem;
+    }
+
+    .feature > .bottom {
+        font-size: 1.25rem;
+        position: relative;
+        bottom: 15px;
+    }
+
+    #features > .wrapper > .container :nth-child(2) {
+        .icon {
+            float: right;
+            padding-left: 20px;
+        }
+
+        .f-title {
+            text-align: end;
+        }
+
+        .bottom {
+            text-align: end;
+        }
+    }
+
+    /* sign-up */
+
+    #signUp > .container {
+        display: flex;
+        flex-direction: column-reverse;
+        height: 100%;
+        margin-top: 200px;
+    }
+
+    .signUp > h2 {
+        font-size: 3rem;
+    }
+
+    .backToTop {
+        margin-bottom: 200px;
+    }
+
+    .text > h3 {
+        font-size: 2rem;
+        padding: 0 2px;
+    }
+
+
 }

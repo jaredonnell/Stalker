@@ -227,3 +227,77 @@ body {
     }
 
 }
+
+/* greeter */
+
+.greet-container {
+  height: 100dvh;
+  width: 100dvw;
+  background-color: transparent;
+  display: flex;
+  flex-direction: column;
+  transition: all .5s ease-in;
+}
+
+.greet {
+  display: flex;
+  justify-content: center;
+  width: 100vw;
+  position: absolute;
+  transform: translate(-50%, -10%);
+  top: 50%;
+  left: 50%;
+  gap: 1.5rem;
+  overflow: hidden;
+  color: #FFC6C6;
+  font-size: 7rem;
+}
+
+.first {
+    opacity: 0;
+    min-width: max-content;
+}
+
+.second {
+    opacity: 0;
+    min-width: max-content;
+}
+
+.first-ani {
+  opacity: 1;
+  animation: wordRaise1 1s 1s ease-in forwards;
+}
+
+.second-ani {
+  opacity: 1;
+  animation: wordRaise2 1s 1.1s ease-in forwards;
+}
+
+.block {
+  position: absolute;
+  top: 60%;
+  transform: translate(-50%, -10%);
+  height: 30dvh;
+  width: 100vw;
+  overflow-x: hidden;
+  background-color: transparent;
+}
+
+
+@keyframes wordRaise1 {
+    from {
+      transform: translateY(500px);
+    }
+    to {
+      transform: translateY(-50px);
+    }
+  }
+
+  @keyframes wordRaise2 {
+    from {
+      transform: translateY(1000px);
+    }
+    to {
+      transform: translateY(-50px);
+    }
+  }

@@ -113,24 +113,39 @@ app.post("/login", async (req, res) => {
       }
     }
 
+    var startQuestion = false;
+
+    const profile = await db.query(
+      "SELECT * FROM profile WHERE username = ($1)", [
+        req.body.username,
+      ]);
+  
+    if (profile.rows[0].stock_pref === null) {
+      startQuestion = true;
+    };
+
     if (exists === true) {
-      res.render("home.ejs", { user: user });
+      res.render("home.ejs", { user: user, profile: profile, setup: startQuestion });
     } else {
       await db.query("INSERT INTO profile (username) VALUES ($1)", [
         req.body.username,
       ]);
-      res.render("home.ejs");
+      res.render("home.ejs", { user: user, profile: profile, startQuestion: setup });
     }
-  } else {
-    check = false;
 
-    res.render("index.ejs", {
+    } else {
+      check = false;
+
+      res.render("index.ejs", {
       name_taken: name_taken,
       check: check,
       username: req.body.new_username,
-    });
-  }
+     });
+    }
+
   db.end();
+
+
 });
 
 app.listen(3000, () => {
