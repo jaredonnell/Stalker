@@ -25,25 +25,31 @@
 
     <div class="area">
 
-      <!--Setup-->
-
       <% if (setup === true) { %>
-        <div class="q-container">
-          <div class="prompt">
+        <!--Setup-->
 
+        <div class="q-container">
+          <div class="prompt jost">
+            <h2>Before you get started, we'll need a little more information:</h2>
           </div>
           <div class="setup_form">
-            <form action="/user-setup">
-              <p>How should we refer to you?</p>
-              <input type="text" name="name" placeholder="Name" required>
-              <p>What are you most interested in?</p>
+            <form action="/user-setup" method="POST">
+              <p class="jost">How should we refer to you?</p>
+              <input class="name" type="text" name="name" placeholder="Name" maxlength="10" required>
+              <input id="hiddenInput" type="text" name="selection" style="visibility: hidden;" value="">
+              <p class="jost">What are you most interested in?</p>
               <div class="stock_options">
-                <div class="option"><input type="button" value="Crypto"></div>
-                <div class="option"><input type="button" value="Forex"></div>
-                <div class="option"><input type="button" value="ETFs"></div>
-                <div class="option"><input type="button" value="Index"></div>
+                <div class="top">
+                  <input class="option jost" id="Crypto" type="button" value="Crypto">
+                  <input class="option jost" id="Forex" type="button" value="Forex">
+                  <input class="option jost" id="ETFs" type="button" value="ETFs">
+                </div>
+                <div class="bottom">
+                  <input class="option jost" id="Index" type="button" value="Index">
+                  <input class="option jost" id="Equities" type='button' value="Equities">
+                </div>
               </div>
-              <input type="submit" value="Submit">
+              <button class="jost sub" type="submit">Submit</button>
             </form>
           </div>
         </div>
@@ -52,7 +58,7 @@
 
       <div class="greet-container">
         <div class="greet">
-          <div class="first jost-head">Welcome,</div><div class="second jost-head"><%= profile.rows[0].username %></div>
+          <div class="first jost-head">Welcome,</div><div class="second jost-head"><%= profile.rows[0].name %></div>
         </div>
         <div class="block"></div>
       </div>
@@ -77,7 +83,7 @@
     </div>
 
     <script>
-      /* pre load */
+      /* pre-load content */
 
       window.addEventListener("load", () => {
         setTimeout(() => {
@@ -103,7 +109,41 @@
         }, 1250);
       });
 
-      /*  pre-qs  */
+      /*  setup  */
+
+      function showLinks() {
+        let links = document.querySelectorAll("input");
+        links.forEach((link) => {
+          link.classList.add("show-link");
+        });
+        document.querySelector('.sub').classList.add('show-link');
+      }
+
+      console.log(document.querySelectorAll(".option"));
+
+      setTimeout(() => {
+          showLinks();
+      }, 2500)
+
+      /* button switch */
+
+      let selection = [];
+
+      document.querySelectorAll('.option').forEach((option) => {
+        option.addEventListener('click', () => {
+          selection.push(option.value)
+          document.getElementById('hiddenInput').value = selection[selection.length - 1]
+          if (selection.length >= 2) {
+            document.getElementById(selection[selection.length - 1]).classList.add('selected');
+            document.getElementById(selection[selection.length - 2]).classList.remove('selected');
+          } else {
+            document.getElementById(selection).classList.add('selected');
+          }
+        })
+               
+      });
+      
+      /*  greeter  */
       
       setTimeout(() => {
         if (document.querySelector('.first').classList.contains('first-ani')) {

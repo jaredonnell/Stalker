@@ -283,7 +283,6 @@ body {
   background-color: transparent;
 }
 
-
 @keyframes wordRaise1 {
     from {
       transform: translateY(500px);
@@ -293,7 +292,7 @@ body {
     }
   }
 
-  @keyframes wordRaise2 {
+@keyframes wordRaise2 {
     from {
       transform: translateY(1000px);
     }
@@ -301,3 +300,132 @@ body {
       transform: translateY(-50px);
     }
   }
+
+/* setup */
+
+.show-link {
+    z-index: 2;
+}
+
+.q-container {
+    height: 100dvh;
+    width: 100vw;
+    display: grid;
+    grid-template-rows: 1fr 4fr;
+    justify-items: center;
+    background-color: transparent;
+}
+
+.prompt {
+    align-self: end;
+    font-size: 2vw;
+    color:#FFC6C6;
+}
+
+.prompt h2 {
+    margin: 0;
+}
+
+.setup_form {
+    align-self: center;
+    min-height: max-content;
+    width: 40%;
+    border: 3px solid #FFC6C6;
+    border-radius: 15px;
+}
+
+.setup_form input {
+    color: #FFC6C6;
+    height: 30px;
+    background-color: transparent;
+    border: 1.5px solid #FFC6C6;
+    border-radius: 15px;
+    align-self: center;
+    position: relative;
+}
+
+.setup_form p {
+    color: #FFC6C6;
+    font-size: 1.75rem;
+    text-align: center;
+}
+
+.setup_form > form {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.name {
+    width: 60%;
+}    
+
+.stock_options {
+    align-self: center;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 50px;
+}
+
+.top {
+    display: flex;
+    width: 100%;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 28px;
+}
+
+.bottom {
+    display: flex;
+    width: 100%;
+    gap:  20px;
+    justify-content: center;
+}
+
+.option {
+    opacity: 0.5;
+    cursor: pointer;
+    min-width: 100px;
+    height: 150px;
+    border: 3px solid #ffd0d0;
+}
+
+.selected {
+    opacity: 1;
+}
+
+.sub {
+    width: 40%;
+    height: 40px;
+    color: #FFC6C6;
+    border: 3px solid #FFC6C6;
+    border-radius: 15px;
+    margin-bottom: 50px;
+    cursor: pointer;
+    transition: all .3s;
+    position: relative;
+    align-self: center;
+    background-color: transparent;
+}
+
+.sub:hover {
+    color: white;
+}
+
+.sub::before {
+    width:0;
+    height: 100%;
+    background-color: #ffc6c6d4;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    content: '';
+    transition: width ease-out .3s;
+    z-index: -1;
+}
+
+.sub:hover::before {
+    width: 100%;
+}

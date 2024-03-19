@@ -1,10 +1,12 @@
-import express from "express";
+import express, { response } from "express";
+import session from 'express-session'
 import pg from "pg";
 import axios from "axios";
 import bodyParser from "body-parser";
 
 const app = express();
 const port = 3000;
+
 // const config = {
 //   type: 'sparkline',
 //   data: {
@@ -26,7 +28,14 @@ let name_taken = true;
 let check = true;
 let current_users = [];
 
+app.use(session({
+  secret: 'aniamtedCrutons486',
+  resave: false,
+  saveUninitialized: true
+}));
+
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(express.static("public"));
 
 app.get("/", async (req, res) => {
@@ -72,6 +81,7 @@ app.post("/sign-up", async (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
+
   const db = new pg.Client({
     user: "postgres",
     host: "localhost",
@@ -79,6 +89,8 @@ app.post("/login", async (req, res) => {
     password: "JDjd28690406$$",
     port: 5432,
   });
+
+  /* authentication */
 
   db.connect();
 
@@ -92,6 +104,8 @@ app.post("/login", async (req, res) => {
 
   console.log(user.rows[0].password);
 
+  /* directs to user page */
+
   if (user.rows[0].password == req.body.password) {
     const db = new pg.Client({
       user: "postgres",
@@ -103,9 +117,9 @@ app.post("/login", async (req, res) => {
 
     db.connect();
 
-    const user_check = await db.query("SELECT * FROM profile");
+    /* check for user profile information */
 
-    console.log(user_check.rows[1]);
+    const user_check = await db.query("SELECT * FROM profile");
 
     for (let i = 0; i < user_check.rows.length; i++) {
       if (user_check.rows[i].username.includes(req.body.username)) {
@@ -113,27 +127,53 @@ app.post("/login", async (req, res) => {
       }
     }
 
+    /* profile setup */ 
+
     var startQuestion = false;
 
-    const profile = await db.query(
-      "SELECT * FROM profile WHERE username = ($1)", [
-        req.body.username,
-      ]);
-  
-    if (profile.rows[0].stock_pref === null) {
-      startQuestion = true;
-    };
+    /* pass username incase of setup */
+
+    const username = req.body.username;
+    req.session.username = username;
+
+    const pref = req.body.selection
+    req.session.selection = pref;
+    console.log('username-saved', {username}, 'selection-saved', {pref});
+
+    /* insert data into profile table as needed */
 
     if (exists === true) {
-      res.render("home.ejs", { user: user, profile: profile, setup: startQuestion });
+
+      const profile = await db.query(
+        "SELECT * FROM profile WHERE username = ($1)", [
+          req.body.username,
+        ]);
+
+      if (profile.rows[0].stock_pref === null) {
+        startQuestion = true;
+      };
+
+      res.render("home.ejs", { profile: profile, setup: startQuestion });
+
+      console.log('yup');
+
     } else {
+
+      startQuestion = true;
+
       await db.query("INSERT INTO profile (username) VALUES ($1)", [
         req.body.username,
       ]);
-      res.render("home.ejs", { user: user, profile: profile, startQuestion: setup });
+
+      const profile = await db.query(
+        "SELECT * FROM profile WHERE username = ($1)", [
+          req.body.username,
+        ]);
+
+      res.render("home.ejs", { profile: profile, setup: startQuestion });
     }
 
-    } else {
+    } else {    /* auth fail */
       check = false;
 
       res.render("index.ejs", {
@@ -143,11 +183,54 @@ app.post("/login", async (req, res) => {
      });
     }
 
+    db.end();
+
+
+});
+
+app.post("/user-setup", async (req, res) => {
+  const db = new pg.Client({
+    user: "postgres",
+    host: "localhost",
+    database: "stalker",
+    password: "JDjd28690406$$",
+    port: 5432,
+  });
+  db.connect();
+
+  console.log('request', req.body );
+
+  const username = req.session.username;
+  console.log('passed', username);
+
+  const pref = req.body.selection;
+  console.log(pref);
+
+  var startQuestion = false;
+
+  /* insert form data */
+
+  console.log(req.body.name)
+
+  const update = await db.query(
+    "UPDATE profile SET name = $1, stock_pref = $2 WHERE username = $3 ", [req.body.name, pref, username]
+  );
+
+  /* grab user profile */
+
+  const profile = await db.query(
+    "SELECT * FROM profile WHERE username = ($1)", [username]
+  );
+
+  console.log(profile.rows[0]);
+
   db.end();
-
-
+  
+  res.render('home.ejs', { profile: profile, setup: startQuestion });
 });
 
 app.listen(3000, () => {
   console.log(`Server running on port ${port}.`);
 });
+
+
