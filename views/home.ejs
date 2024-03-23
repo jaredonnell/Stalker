@@ -24,49 +24,181 @@
     <!------------->
 
     <div class="area">
-
       <% if (setup === true) { %>
-        <!--Setup-->
+      <!--Setup-->
 
-        <div class="q-container">
-          <div class="prompt jost">
-            <h2>Before you get started, we'll need a little more information:</h2>
-          </div>
-          <div class="setup_form">
-            <form action="/user-setup" method="POST">
-              <p class="jost">How should we refer to you?</p>
-              <input class="name" type="text" name="name" placeholder="Name" maxlength="10" required>
-              <input id="hiddenInput" type="text" name="selection" style="visibility: hidden;" value="">
-              <p class="jost">What are you most interested in?</p>
-              <div class="stock_options">
-                <div class="top">
-                  <input class="option jost" id="Crypto" type="button" value="Crypto">
-                  <input class="option jost" id="Forex" type="button" value="Forex">
-                  <input class="option jost" id="ETFs" type="button" value="ETFs">
-                </div>
-                <div class="bottom">
-                  <input class="option jost" id="Index" type="button" value="Index">
-                  <input class="option jost" id="Equities" type='button' value="Equities">
-                </div>
-              </div>
-              <button class="jost sub" type="submit">Submit</button>
-            </form>
-          </div>
+      <div class="q-container">
+        <div class="prompt jost">
+          <h2>Before you get started, we'll need a little more information:</h2>
         </div>
+        <div class="setup_form">
+          <form action="/user-setup" method="POST">
+            <p class="jost">How should we refer to you?</p>
+            <input
+              class="name"
+              type="text"
+              name="name"
+              placeholder="Name"
+              maxlength="10"
+              required
+            />
+            <input
+              id="hiddenInput"
+              type="text"
+              name="selection"
+              style="visibility: hidden"
+              value=""
+            />
+            <p class="jost">What are you most interested in?</p>
+            <div class="stock_options">
+              <div class="top">
+                <input
+                  class="option jost"
+                  id="Crypto"
+                  type="button"
+                  value="Crypto"
+                />
+                <input
+                  class="option jost"
+                  id="Forex"
+                  type="button"
+                  value="Forex"
+                />
+                <input
+                  class="option jost"
+                  id="ETFs"
+                  type="button"
+                  value="ETFs"
+                />
+              </div>
+              <div class="bottom">
+                <input
+                  class="option jost"
+                  id="Index"
+                  type="button"
+                  value="Index"
+                />
+                <input
+                  class="option jost"
+                  id="Equities"
+                  type="button"
+                  value="Equities"
+                />
+              </div>
+            </div>
+            <button class="jost sub" type="submit">Submit</button>
+          </form>
+        </div>
+      </div>
+
       <% } else { %>
       <!--User Greet-->
 
       <div class="greet-container">
         <div class="greet">
-          <div class="first jost-head">Welcome,</div><div class="second jost-head"><%= profile.rows[0].name %></div>
+          <div class="first jost-head">Welcome,</div>
+          <div class="second jost-head"><%= profile.rows[0].name %></div>
         </div>
         <div class="block"></div>
       </div>
+
       <% } %>
 
-      
+      <!--Home-->
 
-      
+      <!--nav-->
+
+      <div class="nav">
+        <div class="side-button">
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+
+        <!--side bar-->
+
+        <div class="side-nav nav-hide">
+          <div class="closer"></div>
+          <div class="side-cont">
+            <div class="side-head">
+              <h2 class="jost-head"><%= profile.rows[0].name %></h2>
+              <p class="jost"><%= profile.rows[0].username %></p>
+            </div>
+            <div class="side-body jost">
+              <div class="personal">
+                <h2>Personal</h2>
+                <ul>
+                  <li>Favorites</li>
+                </ul>
+              </div>
+              <div class="options">
+                <h2>Options</h2>
+                <ul>
+                  <li class="stock_option" value="crypto">Crypto</li>
+                  <li class="stock_option" value="index">Index</li>
+                  <li class="stock_option" value="forex">Forex</li>
+                  <li class="stock_option" value="equities">Equities</li>
+                  <li class="stock_option" value="etfs">ETFs</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="search">
+          <form class="user_search" action="/search" method="GET">
+            <input
+              id="input"
+              type="text"
+              name="search"
+              placeholder="Search over 1000's of stocks"
+            />
+            <input id="search" type="submit" value="Go" />
+          </form>
+        </div>
+
+        <div class="profile">
+          <form action="/user-profile" method="GET">
+            <input
+              type="image"
+              src="./images/profike_icon.png"
+              alt="profile settings"
+            />
+          </form>
+        </div>
+        <div id="overlay"></div>
+      </div>
+
+      <!--Main Content-->
+
+      <div class="wrapper">
+        <div class="filter">
+          <form action="/filter" method="GET">
+            <div class="country">
+              <label for="country" class="jost">Country</label>
+              <select name="country" id="country">
+                <option value="">Any</option>
+              </select>
+            </div>
+            <div class="currency">
+              <label for="currency" class="jost">Currency</label>
+              <select name="currency" id="currency">
+                <option value="">Any</option>
+              </select>
+            </div>
+            <div class="exchange">
+              <label for="exchange" class="jost">Exchange</label>
+              <select name="exchange" id="exchange">
+                <option value="">Any</option>
+              </select>
+            </div>
+            <input type="submit" value="Filter">
+          </form>
+        </div>
+        <div class="option-title jost-head">
+          <h1><%= profile.rows[0].stock_pref %></h1>
+        </div>
+      </div>
 
       <ul class="circles">
         <li></li>
@@ -101,10 +233,9 @@
             }, 750);
             setTimeout(() => {
               document.querySelector(".opener").classList.add("hide");
-              
             }, 1250);
-            document.querySelector('.first').classList.add('first-ani');
-            document.querySelector('.second').classList.add('second-ani');
+            document.querySelector(".first").classList.add("first-ani");
+            document.querySelector(".second").classList.add("second-ani");
           }
         }, 1250);
       });
@@ -113,43 +244,89 @@
 
       function showLinks() {
         let links = document.querySelectorAll("input");
+        let sideLinks = document.querySelectorAll('.stock_option');
         links.forEach((link) => {
           link.classList.add("show-link");
         });
-        document.querySelector('.sub').classList.add('show-link');
+        sideLinks.forEach((link) => {
+          link.classList.add('show-link');
+        })
+        document.querySelector(".sub").classList.add("show-link");
       }
 
-      console.log(document.querySelectorAll(".option"));
-
       setTimeout(() => {
-          showLinks();
-      }, 2500)
+        showLinks();
+      }, 2500);
 
       /* button switch */
 
       let selection = [];
 
-      document.querySelectorAll('.option').forEach((option) => {
-        option.addEventListener('click', () => {
-          selection.push(option.value)
-          document.getElementById('hiddenInput').value = selection[selection.length - 1]
+      document.querySelectorAll(".option").forEach((option) => {
+        option.addEventListener("click", () => {
+          selection.push(option.value);
+          document.getElementById("hiddenInput").value =
+            selection[selection.length - 1];
           if (selection.length >= 2) {
-            document.getElementById(selection[selection.length - 1]).classList.add('selected');
-            document.getElementById(selection[selection.length - 2]).classList.remove('selected');
+            document
+              .getElementById(selection[selection.length - 1])
+              .classList.add("selected");
+            document
+              .getElementById(selection[selection.length - 2])
+              .classList.remove("selected");
           } else {
-            document.getElementById(selection).classList.add('selected');
+            document.getElementById(selection).classList.add("selected");
           }
-        })
-               
+        });
       });
-      
+
       /*  greeter  */
-      
+
       setTimeout(() => {
-        if (document.querySelector('.first').classList.contains('first-ani')) {
-          document.querySelector('.greet-container').classList.add('hide');
+        if (document.querySelector(".first").classList.contains("first-ani")) {
+          let greet = document.querySelector(".greet-container");
+          greet.classList.add("hide");
+          greet.style.height = 0;
         }
       }, 4000);
+
+      /* side-nav */
+
+      document.querySelector(".side-button").addEventListener("click", () => {
+        document.querySelector(".side-nav").classList.remove("nav-hide");
+        document.querySelector(".side-button").classList.add("nav-hide");
+        document.getElementById('overlay').classList.add('show-overlay');
+      });
+
+      document.querySelector(".closer").addEventListener("click", () => {
+        document.querySelector(".side-nav").classList.add("nav-hide");
+
+        setTimeout(() => {
+          document.querySelector(".side-button").classList.remove("nav-hide");
+          document.getElementById('overlay').classList.remove('show-overlay');
+        }, 400);
+      });
+
+      /* side-nav links */
+
+      document.querySelectorAll('.stock_option').forEach((option) => {
+        option.addEventListener('click', () => {
+          fetch ('/selection', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: option.attributes.value.value
+          })
+          .then(response => {
+            if(!response.ok) {
+              throw new Error('error loading content');
+              response.status(500);
+            }
+            return response.json();
+          });
+        });
+      });
 
     </script>
   </body>

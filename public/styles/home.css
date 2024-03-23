@@ -429,3 +429,246 @@ body {
 .sub:hover::before {
     width: 100%;
 }
+
+/* home page */
+
+/* nav */
+
+.nav {
+    max-height: 100px;
+    width: 100vw;
+    display: flex;
+    justify-content: space-between;
+    margin: 25px 10px;
+}
+
+/* side button */
+
+.side-button {
+    max-height: 75px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    z-index: 2;
+    background-color: transparent;
+    min-width: 100px;
+    cursor: pointer;
+    transition: all ease-in .5s;
+}
+
+.side-button > div {
+    background-color: #FFC6C6;
+    height: 15%;
+    width: 90%;
+    border-radius: 15px;
+    transition: all ease-in .5s;
+}
+
+/* search */
+
+.search {
+    max-height: 75px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.search > form {
+    width: 95%;
+    height: fit-content;
+    align-items: center;
+}
+
+.search > form > input {
+    position: relative;
+}
+
+#input {
+    width: 80%;
+    min-height: 35px;
+    margin-right: 10px;
+    background-color: transparent;
+    border: 3px solid #FFC6C6;
+    color: #FFC6C6;
+    border-radius: 15px;
+}
+
+#search {
+    width: 15%;
+    min-height: 45px;
+    background-color: transparent;
+    border: 3px solid #FFC6C6;
+    border-radius: 15px;
+    color: #FFC6C6;
+    transition: all ease .7s;
+    cursor: pointer;
+}
+
+#search:hover {
+    border: 3px solid white;
+    color: white;
+}
+
+/* profile */
+
+.profile {
+    height: 100px;
+    width: 100px;
+    margin-right: 10px;
+    position: relative;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.profile input {
+    max-height: 75px;
+    max-width: 75px;
+    cursor: pointer;
+    position: relative;
+} 
+
+/* side nav */
+
+.side-nav {
+  position: fixed;
+  height: 98dvh;
+  width: 20vw;
+  color: #FFC6C6;
+  border: 3px solid #FFC6C6;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  transition: all ease-in .5s;
+  transform: translate(-10px, -20px);
+  z-index: 10;
+}
+
+.nav-hide {
+  transform: translate(-1000px) !important;
+}
+
+.closer {
+  height: 50px;
+  width: 50px;
+  position: relative;
+  margin-top: 10%;
+  margin-right: 10%;
+  align-self: end;
+  cursor: pointer;
+}
+
+.closer::before,
+.closer::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 5px;
+  background-color: #FFC6C6;
+  margin-top: 35%;
+}
+
+.closer::before {
+  transform: rotate(45deg);
+}
+
+.closer::after {
+  transform: rotate(-45deg);
+}
+
+.side-cont {
+  margin-top: 5%;
+  padding-left: 10%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.side-cont ul {
+  list-style: none;
+  padding-left: 30px;
+}
+
+.side-cont ul li {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  cursor: pointer;
+  transition: all ease .5s
+}
+
+.options li > a {
+    text-decoration: none;
+    color:#FFC6C6;
+}
+
+.options li:hover {
+    color: white;
+}
+
+.side-body h2 {
+  font-style: underline;
+  font-size: 1.75rem;
+  text-decoration: underline;
+}
+
+.side-head > h2 {
+  font-size: 2.5rem;
+  margin:0;
+}
+
+.side-nav p {
+  font-size: 1.5rem;
+  margin-top:0;
+}
+
+.side-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#overlay {
+    position: fixed;
+    right: 10px;
+    height: 100vh;
+    width: 100vw;
+    opacity: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    transition: all ease-in 0.5s;
+}
+  
+.show-overlay {
+    opacity: 1 !important;
+    z-index: 9;
+}
+
+/* main-cont */
+
+.wrapper {
+    width: 100vw;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.filter {
+    width: 75%;
+    display: flex;
+    justify-content: center;
+}
+
+.filter > form {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 15px;
+}
+
+label {
+    color:#FFC6C6;
+    font-size: 1.25rem;
+}

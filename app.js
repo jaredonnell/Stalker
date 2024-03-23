@@ -1,5 +1,5 @@
 import express, { response } from "express";
-import session from 'express-session'
+import session from "express-session";
 import pg from "pg";
 import axios from "axios";
 import bodyParser from "body-parser";
@@ -28,11 +28,13 @@ let name_taken = true;
 let check = true;
 let current_users = [];
 
-app.use(session({
-  secret: 'aniamtedCrutons486',
-  resave: false,
-  saveUninitialized: true
-}));
+app.use(
+  session({
+    secret: "aniamtedCrutons486",
+    resave: false,
+    saveUninitialized: true,
+  })
+);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
@@ -81,7 +83,6 @@ app.post("/sign-up", async (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-
   const db = new pg.Client({
     user: "postgres",
     host: "localhost",
@@ -127,7 +128,7 @@ app.post("/login", async (req, res) => {
       }
     }
 
-    /* profile setup */ 
+    /* profile setup */
 
     var startQuestion = false;
 
@@ -136,29 +137,26 @@ app.post("/login", async (req, res) => {
     const username = req.body.username;
     req.session.username = username;
 
-    const pref = req.body.selection
+    const pref = req.body.selection;
     req.session.selection = pref;
-    console.log('username-saved', {username}, 'selection-saved', {pref});
+    console.log("username-saved", { username }, "selection-saved", { pref });
 
     /* insert data into profile table as needed */
 
     if (exists === true) {
-
       const profile = await db.query(
-        "SELECT * FROM profile WHERE username = ($1)", [
-          req.body.username,
-        ]);
+        "SELECT * FROM profile WHERE username = ($1)",
+        [req.body.username]
+      );
 
       if (profile.rows[0].stock_pref === null) {
         startQuestion = true;
-      };
+      }
 
       res.render("home.ejs", { profile: profile, setup: startQuestion });
 
-      console.log('yup');
-
+      console.log("yup");
     } else {
-
       startQuestion = true;
 
       await db.query("INSERT INTO profile (username) VALUES ($1)", [
@@ -166,26 +164,24 @@ app.post("/login", async (req, res) => {
       ]);
 
       const profile = await db.query(
-        "SELECT * FROM profile WHERE username = ($1)", [
-          req.body.username,
-        ]);
+        "SELECT * FROM profile WHERE username = ($1)",
+        [req.body.username]
+      );
 
       res.render("home.ejs", { profile: profile, setup: startQuestion });
     }
+  } else {
+    /* auth fail */
+    check = false;
 
-    } else {    /* auth fail */
-      check = false;
-
-      res.render("index.ejs", {
+    res.render("index.ejs", {
       name_taken: name_taken,
       check: check,
       username: req.body.new_username,
-     });
-    }
+    });
+  }
 
-    db.end();
-
-
+  db.end();
 });
 
 app.post("/user-setup", async (req, res) => {
@@ -198,10 +194,10 @@ app.post("/user-setup", async (req, res) => {
   });
   db.connect();
 
-  console.log('request', req.body );
+  console.log("request", req.body);
 
   const username = req.session.username;
-  console.log('passed', username);
+  console.log("passed", username);
 
   const pref = req.body.selection;
   console.log(pref);
@@ -210,27 +206,27 @@ app.post("/user-setup", async (req, res) => {
 
   /* insert form data */
 
-  console.log(req.body.name)
+  console.log(req.body.name);
 
   const update = await db.query(
-    "UPDATE profile SET name = $1, stock_pref = $2 WHERE username = $3 ", [req.body.name, pref, username]
+    "UPDATE profile SET name = $1, stock_pref = $2 WHERE username = $3 ",
+    [req.body.name, pref, username]
   );
 
   /* grab user profile */
 
   const profile = await db.query(
-    "SELECT * FROM profile WHERE username = ($1)", [username]
+    "SELECT * FROM profile WHERE username = ($1)",
+    [username]
   );
 
   console.log(profile.rows[0]);
 
   db.end();
-  
-  res.render('home.ejs', { profile: profile, setup: startQuestion });
+
+  res.render("home.ejs", { profile: profile, setup: startQuestion });
 });
 
 app.listen(3000, () => {
   console.log(`Server running on port ${port}.`);
 });
-
-
