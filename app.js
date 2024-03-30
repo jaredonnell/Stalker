@@ -1,6 +1,7 @@
 import express, { response } from "express";
 import session from "express-session";
 import pg from "pg";
+import sqlite3 from "sqlite3";
 import axios from "axios";
 import bodyParser from "body-parser";
 
@@ -16,17 +17,44 @@ const port = 3000;
 //   }
 // }
 
-const db = new pg.Client({
-  user: "postgres",
-  host: "localhost",
-  database: "stalker",
-  password: "JDjd28690406$$",
-  port: 5432,
-});
-
-let name_taken = true;
 let check = true;
-let current_users = [];
+
+async function select(query) {
+  try {
+    const rows = await new Promise((resolve, reject) => {
+      db.all(query, [], (err, rows) => {
+        if (err) {
+          console.log('unable to access data from database');
+          reject(err);
+        } else {
+          resolve(rows);
+        }
+      });
+    });
+    return rows;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+async function insert(query, params) {
+  try {
+      const rows = await new Promise((resolve, rejec) => {
+        db.run(query, params, function(err) {
+          if (err) {
+            console.log('unable to insert data from database');
+            reject(err);
+          } else {
+            resolve(this);
+          }
+        });
+      });
+      return rows;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
 
 app.use(
   session({
@@ -41,40 +69,36 @@ app.use(express.json());
 app.use(express.static("public"));
 
 app.get("/", async (req, res) => {
-  res.render("index.ejs", { name_taken: name_taken });
+  res.render("index.ejs", { name_taken: "" });
 });
 
 app.post("/sign-up", async (req, res) => {
-  const db = new pg.Client({
-    user: "postgres",
-    host: "localhost",
-    database: "stalker",
-    password: "JDjd28690406$$",
-    port: 5432,
+  
+  const db = new sqlite3.Database('./data/stalker.db', (err) => {
+    if (err) {
+      console.log('Could not connect to database');
+    } else {
+      console.log('Connection successful');
+    }
   });
 
-  db.connect();
+ const response = await select("SELECT * FROM auth");
+ const current_users = response.map(user => user.username);
+ const name_taken = current_users.includes(req.body.new_username)
 
-  const response = await db.query("SELECT * FROM auth");
+  console.log(name_taken);
+  console.log(current_users);
 
-  console.log(req.body.new_username);
+  if (!name_taken) {
 
-  response.rows.forEach((user) => {
-    current_users.push(user.username);
-  });
-
-  if (!current_users.includes(req.body.new_username)) {
-    name_taken = false;
-  }
-
-  if (name_taken == false) {
-    await db.query("INSERT INTO auth (username, password) VALUES ($1, $2)", [
+   await insert("INSERT INTO auth (username, password) VALUES ($1, $2)", [
       req.body.new_username,
       req.body.new_password,
-    ]);
-  }
+   ]); 
 
-  db.end();
+  };
+
+  db.close();
 
   res.render("index.ejs", {
     name_taken: name_taken,
@@ -83,46 +107,35 @@ app.post("/sign-up", async (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-  const db = new pg.Client({
-    user: "postgres",
-    host: "localhost",
-    database: "stalker",
-    password: "JDjd28690406$$",
-    port: 5432,
+  
+  const db = new sqlite3.Database('./data/stalker.db', (err) => {
+    if (err) {
+      console.log('Could not connect to database');
+    } else {
+      console.log('Connection successful');
+    }
   });
 
   /* authentication */
 
-  db.connect();
-
-  const user = await db.query("SELECT * FROM auth WHERE username = $1", [
+  const user = await select("SELECT * FROM auth WHERE username = $1", [
     req.body.username,
   ]);
 
   let exists = false;
 
-  db.end();
-
-  console.log(user.rows[0].password);
+  console.log(user[0].password);
 
   /* directs to user page */
 
-  if (user.rows[0].password == req.body.password) {
-    const db = new pg.Client({
-      user: "postgres",
-      host: "localhost",
-      database: "stalker",
-      password: "JDjd28690406$$",
-      port: 5432,
-    });
+  if (user[0].password == req.body.password) {
 
-    db.connect();
 
     /* check for user profile information */
 
-    const user_check = await db.query("SELECT * FROM profile");
+    const user_check = await select("SELECT * FROM profile");
 
-    for (let i = 0; i < user_check.rows.length; i++) {
+    for (let i = 0; i < user_check.length; i++) {
       if (user_check.rows[i].username.includes(req.body.username)) {
         exists = true;
       }
