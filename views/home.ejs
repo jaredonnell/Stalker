@@ -97,7 +97,7 @@
       <div class="greet-container">
         <div class="greet">
           <div class="first jost-head">Welcome,</div>
-          <div class="second jost-head"><%= profile.rows[0].name %></div>
+          <div class="second jost-head"><%= profile[0].name %></div>
         </div>
         <div class="block"></div>
       </div>
@@ -121,8 +121,8 @@
           <div class="closer"></div>
           <div class="side-cont">
             <div class="side-head">
-              <h2 class="jost-head"><%= profile.rows[0].name %></h2>
-              <p class="jost"><%= profile.rows[0].username %></p>
+              <h2 class="jost-head"><%= profile[0].name %></h2>
+              <p class="jost"><%= profile[0].username %></p>
             </div>
             <div class="side-body jost">
               <div class="personal">
@@ -196,7 +196,7 @@
           </form>
         </div>
         <div class="option-title jost-head">
-          <h1><%= profile.rows[0].stock_pref %></h1>
+          <h1><%= profile[0].stock_pref %></h1>
         </div>
       </div>
 

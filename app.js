@@ -16,13 +16,21 @@ const port = 3000;
 //     }]
 //   }
 // }
+  
+  const db = new sqlite3.Database('./data/stalker.db', (err) => {
+    if (err) {
+      console.log('Could not connect to database');
+    } else {
+      console.log('Connection successful');
+    }
+  });
 
 let check = true;
 
-async function select(query) {
+async function select(query, params) {
   try {
     const rows = await new Promise((resolve, reject) => {
-      db.all(query, [], (err, rows) => {
+      db.all(query, params, (err, rows) => {
         if (err) {
           console.log('unable to access data from database');
           reject(err);
@@ -124,7 +132,7 @@ app.post("/login", async (req, res) => {
 
   let exists = false;
 
-  console.log(user[0].password);
+  console.log(user);
 
   /* directs to user page */
 
@@ -136,7 +144,7 @@ app.post("/login", async (req, res) => {
     const user_check = await select("SELECT * FROM profile");
 
     for (let i = 0; i < user_check.length; i++) {
-      if (user_check.rows[i].username.includes(req.body.username)) {
+      if (user_check[i].username.includes(req.body.username)) {
         exists = true;
       }
     }
@@ -157,12 +165,12 @@ app.post("/login", async (req, res) => {
     /* insert data into profile table as needed */
 
     if (exists === true) {
-      const profile = await db.query(
+      const profile = await select(
         "SELECT * FROM profile WHERE username = ($1)",
         [req.body.username]
       );
 
-      if (profile.rows[0].stock_pref === null) {
+      if (profile[0].stock_pref === null) {
         startQuestion = true;
       }
 
@@ -172,11 +180,11 @@ app.post("/login", async (req, res) => {
     } else {
       startQuestion = true;
 
-      await db.query("INSERT INTO profile (username) VALUES ($1)", [
+   await insert("INSERT INTO profile (username) VALUES ($1)", [
         req.body.username,
       ]);
 
-      const profile = await db.query(
+      const profile = await select(
         "SELECT * FROM profile WHERE username = ($1)",
         [req.body.username]
       );
@@ -194,7 +202,7 @@ app.post("/login", async (req, res) => {
     });
   }
 
-  db.end();
+  db.close();
 });
 
 app.post("/user-setup", async (req, res) => {
