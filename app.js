@@ -206,14 +206,15 @@ app.post("/login", async (req, res) => {
 });
 
 app.post("/user-setup", async (req, res) => {
-  const db = new pg.Client({
-    user: "postgres",
-    host: "localhost",
-    database: "stalker",
-    password: "JDjd28690406$$",
-    port: 5432,
+
+  const db = new sqlite3.Database('./data/stalker.db', (err) => {
+    if (err) {
+      console.log('Could not connect to database');
+    } else {
+      console.log('Connection successful');
+    }
   });
-  db.connect();
+
 
   console.log("request", req.body);
 
@@ -229,23 +230,23 @@ app.post("/user-setup", async (req, res) => {
 
   console.log(req.body.name);
 
-  const update = await db.query(
+  const update = await insert(
     "UPDATE profile SET name = $1, stock_pref = $2 WHERE username = $3 ",
     [req.body.name, pref, username]
   );
 
   /* grab user profile */
 
-  const profile = await db.query(
+  const profile = await select(
     "SELECT * FROM profile WHERE username = ($1)",
     [username]
   );
 
-  console.log(profile.rows[0]);
-
-  db.end();
+  console.log(profile[0]);
 
   res.render("home.ejs", { profile: profile, setup: startQuestion });
+
+  db.close();
 });
 
 app.listen(3000, () => {
