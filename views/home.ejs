@@ -178,18 +178,27 @@
               <label for="country" class="jost">Country</label>
               <select name="country" id="country">
                 <option value="">Any</option>
+                <% for (let i = 0; i < countries.length; i++) { %>
+                    <option value="<%= countries[i] %>"><%= countries[i] %></option>
+               <% } %>
               </select>
             </div>
             <div class="currency">
               <label for="currency" class="jost">Currency</label>
               <select name="currency" id="currency">
                 <option value="">Any</option>
+                <% for (let i = 0; i < currencies.length; i++) { %>
+                  <option value="<%= currencies[i] %>"><%= currencies[i] %></option>
+                <% } %>
               </select>
             </div>
             <div class="exchange">
               <label for="exchange" class="jost">Exchange</label>
               <select name="exchange" id="exchange">
                 <option value="">Any</option>
+                <% for (let i = 0; i < exchanges.length; i++) { %>
+                  <option value="<%= exchanges[i] %>"><%= exchanges[i] %></option>
+                <% } %>
               </select>
             </div>
             <input id="filter-sub" type="submit" value="Filter">
@@ -245,12 +254,18 @@
       function showLinks() {
         let links = document.querySelectorAll("input");
         let sideLinks = document.querySelectorAll('.stock_option');
+        let selectors = document.querySelectorAll('select');
+
         links.forEach((link) => {
           link.classList.add("show-link");
         });
         sideLinks.forEach((link) => {
           link.classList.add('show-link');
-        })
+        });
+        selectors.forEach((link) => {
+          link.classList.add('show-link');
+        });
+        
         document.querySelector(".sub").classList.add("show-link");
       }
 

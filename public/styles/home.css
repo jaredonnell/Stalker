@@ -536,7 +536,7 @@ body {
 .side-nav {
   position: fixed;
   height: 98dvh;
-  width: 20vw;
+  width: 15vw;
   min-width: 250px;
   color: #FFC6C6;
   border: 3px solid #FFC6C6;
@@ -605,7 +605,7 @@ body {
     color:#FFC6C6;
 }
 
-.options li:hover {
+.side-cont li:hover {
     color: white;
 }
 
@@ -616,12 +616,12 @@ body {
 }
 
 .side-head > h2 {
-  font-size: 2.5rem;
+  font-size: 3rem;
   margin:0;
 }
 
 .side-nav p {
-  font-size: 1.5rem;
+  font-size: 2rem;
   margin-top:0;
 }
 
@@ -640,7 +640,7 @@ body {
     margin-right: -10px;
     opacity: 0;
     background-color: rgba(0, 0, 0, 0.8);
-    transition: all ease-in 0.5s;
+    transition: opacity ease-in 0.5s;
 }
   
 .show-overlay {
@@ -659,8 +659,10 @@ body {
     align-items: center;
 }
 
+/* filter */
+
 .filter {
-    width: 90%;
+    width: 80%;
     display: flex;
     justify-content: center;
     margin-bottom: 50px;
@@ -679,15 +681,20 @@ label {
 }
 
 select {
+    position: relative;
     width: 50%;
     height: 75%;
     max-width: 150px;
     margin-left: 10px;
-    background-color: transparent;
+    background-color: #121212;
     color:#FFC6C6;
     text-align: center;
     border: 1px solid #FFC6C6;
     border-radius: 5px;
+}
+
+select::-webkit-scrollbar {
+    visibility: hidden;
 }
 
 #filter-sub {
@@ -702,5 +709,4 @@ select {
 .option-title {
     font-size: 2.5rem;
     color:#FFC6C6;
-
 }
