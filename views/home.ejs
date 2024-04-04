@@ -172,7 +172,9 @@
       <!--Main Content-->
 
       <div class="wrapper">
-        <div class="filter">
+        <% if (profile[0].stock_pref === 'Equities' || profile[0].stock_pref === 'Index' || profile[0].stock_pref === 'ETFs') { %>
+
+                  <div class="filter">
           <form action="/filter" method="GET">
             <div class="country">
               <label for="country" class="jost">Country</label>
@@ -204,6 +206,61 @@
             <input id="filter-sub" type="submit" value="Filter">
           </form>
         </div>
+
+       <% } else if (profile[0].stock_pref === 'Crypto'){ %>
+
+        <div class="filter">
+          <form action="/filter" method="GET" style="grid-template-columns: 2fr 2fr 1fr;">
+            <div class="currency_base">
+              <label for="currency_base" class="jost">Currency Base</label>
+              <select name="currency_base" id="currency_base">
+                <option value="">Any</option>
+                <% for (let i = 0; i < currency_base.length; i++) { %>
+                  <option value="<%= currency_base[i] %>"><%= currency_base[i] %></option>
+                <% } %>
+              </select>
+            </div>
+            <div class="currency_quote">
+              <label for="currency_quote" class="jost">Currency Quote</label>
+              <select name="currency_quote" id="currency_quote">
+                <option value="">Any</option>
+                <% for (let i = 0; i < currency_quote.length; i++) { %>
+                  <option value="<%= currency_quote[i] %>"><%= currency_quote[i] %></option>
+                <% } %>
+              </select>
+            </div>
+            <input id="filter-sub" type="submit" value="Filter">
+          </form>
+        </div>
+
+      <% } else if (profile[0].stock_pref === 'Forex') { %>
+
+        <div class="filter">
+          <form action="/filter" method="GET" style="grid-template-columns: 2fr 2fr 1fr;">
+            <div class="currency_base">
+              <label for="currency_base" class="jost">Currency Base</label>
+              <select name="currency_base" id="currency_base">
+                <option value="">Any</option>
+                <% for (let i = 0; i < currency_base.length; i++) { %>
+                  <option value="<%= currency_base[i] %>"><%= currency_base[i] %></option>
+                <% } %>
+              </select>
+            </div>
+            <div class="currency_group">
+              <label for="currency_group" class="jost">Currency Group</label>
+              <select name="currency_group" id="currency_group">
+                <option value="">Any</option>
+                <% for (let i = 0; i < currency_group.length; i++) { %>
+                  <option value="<%= currency_group[i] %>"><%= currency_group[i] %></option>
+                <% } %>
+              </select>
+            </div>
+            <input id="filter-sub" type="submit" value="Filter">
+          </form>
+        </div>
+
+     <% } %>
+
         <div class="option-title jost-head">
           <h1><%= profile[0].stock_pref %></h1>
         </div>
