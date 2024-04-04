@@ -15,14 +15,14 @@ const port = 3000;
 //     }]
 //   }
 // }
-  
-  const db = new sqlite3.Database('./data/stalker.db', (err) => {
-    if (err) {
-      console.log('Could not connect to database');
-    } else {
-      console.log('Connection successful');
-    }
-  });
+
+const db = new sqlite3.Database("./data/stalker.db", (err) => {
+  if (err) {
+    console.log("Could not connect to database");
+  } else {
+    console.log("Connection successful");
+  }
+});
 
 let check = true;
 
@@ -31,7 +31,7 @@ async function select(query, params) {
     const rows = await new Promise((resolve, reject) => {
       db.all(query, params, (err, rows) => {
         if (err) {
-          console.log('unable to access data from database');
+          console.log("unable to access data from database");
           reject(err);
         } else {
           resolve(rows);
@@ -42,26 +42,26 @@ async function select(query, params) {
   } catch (err) {
     console.error(err);
   }
-};
+}
 
 async function insert(query, params) {
   try {
-      const rows = await new Promise((resolve, rejec) => {
-        db.run(query, params, function(err) {
-          if (err) {
-            console.log('unable to insert data from database');
-            reject(err);
-          } else {
-            resolve(this);
-          }
-        });
+    const rows = await new Promise((resolve, rejec) => {
+      db.run(query, params, function (err) {
+        if (err) {
+          console.log("unable to insert data from database");
+          reject(err);
+        } else {
+          resolve(this);
+        }
       });
-      return rows;
+    });
+    return rows;
   } catch (err) {
     console.error(err);
     throw err;
   }
-};
+}
 
 app.use(
   session({
@@ -80,30 +80,27 @@ app.get("/", async (req, res) => {
 });
 
 app.post("/sign-up", async (req, res) => {
-  
-  const db = new sqlite3.Database('./data/stalker.db', (err) => {
+  const db = new sqlite3.Database("./data/stalker.db", (err) => {
     if (err) {
-      console.log('Could not connect to database');
+      console.log("Could not connect to database");
     } else {
-      console.log('Connection successful');
+      console.log("Connection successful");
     }
   });
 
- const response = await select("SELECT * FROM auth");
- const current_users = response.map(user => user.username);
- const name_taken = current_users.includes(req.body.new_username)
+  const response = await select("SELECT * FROM auth");
+  const current_users = response.map((user) => user.username);
+  const name_taken = current_users.includes(req.body.new_username);
 
   console.log(name_taken);
   console.log(current_users);
 
   if (!name_taken) {
-
-   await insert("INSERT INTO auth (username, password) VALUES ($1, $2)", [
+    await insert("INSERT INTO auth (username, password) VALUES ($1, $2)", [
       req.body.new_username,
       req.body.new_password,
-   ]); 
-
-  };
+    ]);
+  }
 
   db.close();
 
@@ -114,12 +111,11 @@ app.post("/sign-up", async (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-  
-  const db = new sqlite3.Database('./data/stalker.db', (err) => {
+  const db = new sqlite3.Database("./data/stalker.db", (err) => {
     if (err) {
-      console.log('Could not connect to database');
+      console.log("Could not connect to database");
     } else {
-      console.log('Connection successful');
+      console.log("Connection successful");
     }
   });
 
@@ -136,8 +132,6 @@ app.post("/login", async (req, res) => {
   /* directs to user page */
 
   if (user[0].password == req.body.password) {
-
-
     /* check for user profile information */
 
     const user_check = await select("SELECT * FROM profile");
@@ -170,68 +164,70 @@ app.post("/login", async (req, res) => {
       );
 
       if (profile[0].stock_pref !== null) {
+        const preferred_stocks = await select(
+          `SELECT * FROM ${profile[0].stock_pref.toLowerCase()}`
+        );
 
-      const preferred_stocks = await select(
-        `SELECT * FROM ${profile[0].stock_pref.toLowerCase()}`,
-      );
+        // if (profile[0].stock_pref === null) {
+        //   startQuestion = true;
+        // }
 
-      // if (profile[0].stock_pref === null) {
-      //   startQuestion = true;
-      // }
+        /* filter options config */
 
-      /* filter options config */
+        let countries = [];
+        let exchanges = [];
+        let currencies = [];
+        let currency_base = [];
+        let currency_quote = [];
+        let currency_group = [];
 
-      let countries = [];
-      let exchanges = [];
-      let currencies = [];
-      let currency_base = [];
-      let currency_quote = [];
-      let currency_group = [];
+        if (
+          profile[0].stock_pref === "Equities" ||
+          profile[0].stock_pref === "Index" ||
+          profile[0].stock_pref === "ETFs"
+        ) {
+          for (let i = 0; i < preferred_stocks.length; i++) {
+            countries.push(preferred_stocks[i].country);
+            exchanges.push(preferred_stocks[i].exchange);
+            currencies.push(preferred_stocks[i].currency);
+          }
 
-      if (profile[0].stock_pref === 'Equities' || profile[0].stock_pref === 'Index' || profile[0].stock_pref === 'ETFs') {
+          countries = [...new Set(countries)];
+          currencies = [...new Set(currencies)];
+          exchanges = [...new Set(exchanges)];
+        } else if (profile[0].stock_pref === "Crypto") {
+          for (let i = 0; i < preferred_stocks.length; i++) {
+            currency_base.push(preferred_stocks[i].currency_base);
+            currency_quote.push(preferred_stocks[i].currency_quote);
+          }
 
-        for (let i = 0; i < preferred_stocks.length; i++) {
-          countries.push(preferred_stocks[i].country);
-          exchanges.push(preferred_stocks[i].exchange);
-          currencies.push(preferred_stocks[i].currency);
-        };
+          currency_base = [...new Set(currency_base)];
+          currency_quote = [...new Set(currency_quote)];
+        } else if (profile[0].stock_pref === "Forex") {
+          for (let i = 0; i < preferred_stocks.length; i++) {
+            currency_base.push(preferred_stocks[i].currency_base);
+            currency_group.push(preferred_stocks[i].currency_group);
+          }
 
-        countries = [...new Set(countries)];;
-        currencies = [...new Set(currencies)];
-        exchanges = [...new Set(exchanges)];
+          currency_base = [...new Set(currency_base)];
+          currency_group = [...new Set(currency_group)];
+        }
 
-      } else if (profile[0].stock_pref === 'Crypto') {
-
-        for (let i = 0; i < preferred_stocks.length; i++) {
-          currency_base.push(preferred_stocks[i].currency_base);
-          currency_quote.push(preferred_stocks[i].currency_quote);
-        };
-
-        currency_base = [...new Set(currency_base)];
-        currency_quote = [...new Set(currency_quote)];
-
-        console.log(currency_base);
-
-      } else if (profile[0].stock_pref === 'Forex') {
-
-        for (let i = 0; i < preferred_stocks.length; i++) {
-          currency_base.push(preferred_stocks[i].currency_base);
-          currency_group.push(preferred_stocks[i].currency_group);
-        } 
-
-        currency_base = [...new Set(currency_base)];
-        currency_group = [...new Set(currency_group)];
-
-      }
-
-      res.render("home.ejs", { profile: profile, setup: startQuestion, preferred_stocks: preferred_stocks, countries: countries, currencies: currencies, exchanges: exchanges, currency_quote: currency_quote, currency_base: currency_base, currency_group: currency_group });
-
+        res.render("home.ejs", {
+          profile: profile,
+          setup: startQuestion,
+          preferred_stocks: preferred_stocks,
+          countries: countries,
+          currencies: currencies,
+          exchanges: exchanges,
+          currency_quote: currency_quote,
+          currency_base: currency_base,
+          currency_group: currency_group,
+        });
       } else {
-
         startQuestion = true;
         res.render("home.ejs", { profile: profile, setup: startQuestion });
-
-      };
+      }
 
       console.log("yup");
     } else {
@@ -240,13 +236,13 @@ app.post("/login", async (req, res) => {
       await insert("INSERT INTO profile (username) VALUES ($1)", [
         req.body.username,
       ]);
-      
+
       const profile = await select(
         "SELECT * FROM profile WHERE username = ($1)",
         [req.body.username]
       );
 
-      res.render("home.ejs", { profile: profile, setup: startQuestion,  });
+      res.render("home.ejs", { profile: profile, setup: startQuestion });
     }
   } else {
     /* auth fail */
@@ -258,22 +254,19 @@ app.post("/login", async (req, res) => {
       check: check,
       username: req.body.new_username,
     });
-
   }
 
   db.close();
 });
 
 app.post("/user-setup", async (req, res) => {
-
-  const db = new sqlite3.Database('./data/stalker.db', (err) => {
+  const db = new sqlite3.Database("./data/stalker.db", (err) => {
     if (err) {
-      console.log('Could not connect to database');
+      console.log("Could not connect to database");
     } else {
-      console.log('Connection successful');
+      console.log("Connection successful");
     }
   });
-
 
   console.log("request", req.body);
 
@@ -296,14 +289,68 @@ app.post("/user-setup", async (req, res) => {
 
   /* grab user profile */
 
-  const profile = await select(
-    "SELECT * FROM profile WHERE username = ($1)",
-    [username]
+  const profile = await select("SELECT * FROM profile WHERE username = ($1)", [
+    username,
+  ]);
+
+  const preferred_stocks = await select(
+    `SELECT * FROM ${profile[0].stock_pref.toLowerCase()}`
   );
+
+  /* filter options config */
+
+  let countries = [];
+  let exchanges = [];
+  let currencies = [];
+  let currency_base = [];
+  let currency_quote = [];
+  let currency_group = [];
+
+  if (
+    profile[0].stock_pref === "Equities" ||
+    profile[0].stock_pref === "Index" ||
+    profile[0].stock_pref === "ETFs"
+  ) {
+    for (let i = 0; i < preferred_stocks.length; i++) {
+      countries.push(preferred_stocks[i].country);
+      exchanges.push(preferred_stocks[i].exchange);
+      currencies.push(preferred_stocks[i].currency);
+    }
+
+    countries = [...new Set(countries)];
+    currencies = [...new Set(currencies)];
+    exchanges = [...new Set(exchanges)];
+  } else if (profile[0].stock_pref === "Crypto") {
+    for (let i = 0; i < preferred_stocks.length; i++) {
+      currency_base.push(preferred_stocks[i].currency_base);
+      currency_quote.push(preferred_stocks[i].currency_quote);
+    }
+
+    currency_base = [...new Set(currency_base)];
+    currency_quote = [...new Set(currency_quote)];
+  } else if (profile[0].stock_pref === "Forex") {
+    for (let i = 0; i < preferred_stocks.length; i++) {
+      currency_base.push(preferred_stocks[i].currency_base);
+      currency_group.push(preferred_stocks[i].currency_group);
+    }
+
+    currency_base = [...new Set(currency_base)];
+    currency_group = [...new Set(currency_group)];
+  }
 
   console.log(profile[0]);
 
-  res.render("home.ejs", { profile: profile, setup: startQuestion });
+  res.render("home.ejs", {
+    profile: profile,
+    setup: startQuestion,
+    preferred_stocks: preferred_stocks,
+    currencies: currencies,
+    exchanges: exchanges,
+    countries: countries,
+    currency_base: currency_base,
+    currency_group: currency_group,
+    currency_quote: currency_quote,
+  });
 
   db.close();
 });

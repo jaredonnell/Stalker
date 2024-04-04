@@ -172,17 +172,17 @@
       <!--Main Content-->
 
       <div class="wrapper">
-        <% if (profile[0].stock_pref === 'Equities' || profile[0].stock_pref === 'Index' || profile[0].stock_pref === 'ETFs') { %>
+        <% if (profile[0].stock_pref === 'Equities' || profile[0].stock_pref ==='Index' || profile[0].stock_pref === 'ETFs') { %>
 
-                  <div class="filter">
+        <div class="filter">
           <form action="/filter" method="GET">
             <div class="country">
               <label for="country" class="jost">Country</label>
               <select name="country" id="country">
                 <option value="">Any</option>
                 <% for (let i = 0; i < countries.length; i++) { %>
-                    <option value="<%= countries[i] %>"><%= countries[i] %></option>
-               <% } %>
+                <option value="<%= countries[i] %>"><%= countries[i] %></option>
+                <% } %>
               </select>
             </div>
             <div class="currency">
@@ -190,7 +190,9 @@
               <select name="currency" id="currency">
                 <option value="">Any</option>
                 <% for (let i = 0; i < currencies.length; i++) { %>
-                  <option value="<%= currencies[i] %>"><%= currencies[i] %></option>
+                <option value="<%= currencies[i] %>">
+                  <%= currencies[i] %>
+                </option>
                 <% } %>
               </select>
             </div>
@@ -199,24 +201,30 @@
               <select name="exchange" id="exchange">
                 <option value="">Any</option>
                 <% for (let i = 0; i < exchanges.length; i++) { %>
-                  <option value="<%= exchanges[i] %>"><%= exchanges[i] %></option>
+                <option value="<%= exchanges[i] %>"><%= exchanges[i] %></option>
                 <% } %>
               </select>
             </div>
-            <input id="filter-sub" type="submit" value="Filter">
+            <input id="filter-sub" type="submit" value="Filter" />
           </form>
         </div>
 
-       <% } else if (profile[0].stock_pref === 'Crypto'){ %>
+        <% } else if (profile[0].stock_pref === 'Crypto'){ %>
 
         <div class="filter">
-          <form action="/filter" method="GET" style="grid-template-columns: 2fr 2fr 1fr;">
+          <form
+            action="/filter"
+            method="GET"
+            style="grid-template-columns: 2fr 2fr 1fr"
+          >
             <div class="currency_base">
               <label for="currency_base" class="jost">Currency Base</label>
               <select name="currency_base" id="currency_base">
                 <option value="">Any</option>
                 <% for (let i = 0; i < currency_base.length; i++) { %>
-                  <option value="<%= currency_base[i] %>"><%= currency_base[i] %></option>
+                <option value="<%= currency_base[i] %>">
+                  <%= currency_base[i] %>
+                </option>
                 <% } %>
               </select>
             </div>
@@ -225,24 +233,32 @@
               <select name="currency_quote" id="currency_quote">
                 <option value="">Any</option>
                 <% for (let i = 0; i < currency_quote.length; i++) { %>
-                  <option value="<%= currency_quote[i] %>"><%= currency_quote[i] %></option>
+                <option value="<%= currency_quote[i] %>">
+                  <%= currency_quote[i] %>
+                </option>
                 <% } %>
               </select>
             </div>
-            <input id="filter-sub" type="submit" value="Filter">
+            <input id="filter-sub" type="submit" value="Filter" />
           </form>
         </div>
 
-      <% } else if (profile[0].stock_pref === 'Forex') { %>
+        <% } else if (profile[0].stock_pref === 'Forex') { %>
 
         <div class="filter">
-          <form action="/filter" method="GET" style="grid-template-columns: 2fr 2fr 1fr;">
+          <form
+            action="/filter"
+            method="GET"
+            style="grid-template-columns: 2fr 2fr 1fr"
+          >
             <div class="currency_base">
               <label for="currency_base" class="jost">Currency Base</label>
               <select name="currency_base" id="currency_base">
                 <option value="">Any</option>
                 <% for (let i = 0; i < currency_base.length; i++) { %>
-                  <option value="<%= currency_base[i] %>"><%= currency_base[i] %></option>
+                <option value="<%= currency_base[i] %>">
+                  <%= currency_base[i] %>
+                </option>
                 <% } %>
               </select>
             </div>
@@ -251,15 +267,17 @@
               <select name="currency_group" id="currency_group">
                 <option value="">Any</option>
                 <% for (let i = 0; i < currency_group.length; i++) { %>
-                  <option value="<%= currency_group[i] %>"><%= currency_group[i] %></option>
+                <option value="<%= currency_group[i] %>">
+                  <%= currency_group[i] %>
+                </option>
                 <% } %>
               </select>
             </div>
-            <input id="filter-sub" type="submit" value="Filter">
+            <input id="filter-sub" type="submit" value="Filter" />
           </form>
         </div>
 
-     <% } %>
+        <% } %>
 
         <div class="option-title jost-head">
           <h1><%= profile[0].stock_pref %></h1>
@@ -310,19 +328,19 @@
 
       function showLinks() {
         let links = document.querySelectorAll("input");
-        let sideLinks = document.querySelectorAll('.stock_option');
-        let selectors = document.querySelectorAll('select');
+        let sideLinks = document.querySelectorAll(".stock_option");
+        let selectors = document.querySelectorAll("select");
 
         links.forEach((link) => {
           link.classList.add("show-link");
         });
         sideLinks.forEach((link) => {
-          link.classList.add('show-link');
+          link.classList.add("show-link");
         });
         selectors.forEach((link) => {
-          link.classList.add('show-link');
+          link.classList.add("show-link");
         });
-        
+
         document.querySelector(".sub").classList.add("show-link");
       }
 
@@ -367,7 +385,7 @@
       document.querySelector(".side-button").addEventListener("click", () => {
         document.querySelector(".side-nav").classList.remove("nav-hide");
         document.querySelector(".side-button").classList.add("nav-hide");
-        document.getElementById('overlay').classList.add('show-overlay');
+        document.getElementById("overlay").classList.add("show-overlay");
       });
 
       document.querySelector(".closer").addEventListener("click", () => {
@@ -375,31 +393,29 @@
 
         setTimeout(() => {
           document.querySelector(".side-button").classList.remove("nav-hide");
-          document.getElementById('overlay').classList.remove('show-overlay');
+          document.getElementById("overlay").classList.remove("show-overlay");
         }, 400);
       });
 
       /* side-nav links */
 
-      document.querySelectorAll('.stock_option').forEach((option) => {
-        option.addEventListener('click', () => {
-          fetch ('/selection', {
-            method: 'POST',
+      document.querySelectorAll(".stock_option").forEach((option) => {
+        option.addEventListener("click", () => {
+          fetch("/selection", {
+            method: "POST",
             headers: {
-              'Content-Type': 'application/json'
+              "Content-Type": "application/json",
             },
-            body: option.attributes.value.value
-          })
-          .then(response => {
-            if(!response.ok) {
-              throw new Error('error loading content');
+            body: option.attributes.value.value,
+          }).then((response) => {
+            if (!response.ok) {
+              throw new Error("error loading content");
               response.status(500);
             }
             return response.json();
           });
         });
       });
-
     </script>
   </body>
 </html>
