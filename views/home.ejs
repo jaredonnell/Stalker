@@ -108,7 +108,7 @@
 
       <!--nav-->
 
-      <div class="nav">
+      <div class="nav hide">
         <div class="side-button">
           <div></div>
           <div></div>
@@ -171,7 +171,7 @@
 
       <!--Main Content-->
 
-      <div class="wrapper">
+      <div class="wrapper hide">
         <% if (profile[0].stock_pref === 'Equities' || profile[0].stock_pref ==='Index' || profile[0].stock_pref === 'ETFs') { %>
 
         <div class="filter">
@@ -284,6 +284,39 @@
         </div>
       </div>
 
+      <!--cards-->
+
+      <div class="card-wrap">
+        <div class="card">
+          <div class="main">
+            <div class="logo">
+
+            </div>
+            <div class="card-title">
+              <h3 class="jost-head">CRP</h3>
+              <p class="jost">Corp Co.</p>
+            </div>
+            <div class="change">
+              <h3 class="jost">1.96%</h3>
+              <h3 class="jost">$196.44</h3>
+            </div>
+            <div class="volume">
+              <h3 class="jost">Volume:</h3>
+              <h3 class="jost">11324437</h3>
+            </div>
+            <div class="indicator">
+
+            </div>
+          </div>
+          <div class="graph">
+
+          </div>
+          <div class="expander">
+            <img src="./images/dwn_carrot.png" alt="">
+          </div>
+        </div>
+      </div>
+
       <ul class="circles">
         <li></li>
         <li></li>
@@ -304,24 +337,29 @@
       window.addEventListener("load", () => {
         setTimeout(() => {
           document.querySelector(".loader").classList.add("hide");
-        }, 700);
+        }, 500);
 
         setTimeout(() => {
           if (document.querySelector(".loader").classList.contains("hide")) {
             console.log("gotcha");
             setTimeout(() => {
               document.querySelector(".opener").classList.add("fade-in");
-            }, 500);
-            setTimeout(() => {
-              document.querySelector(".opener").classList.remove("fade-in");
             }, 750);
             setTimeout(() => {
+              document.querySelector(".opener").classList.remove("fade-in");
+            }, 1000);
+            setTimeout(() => {
               document.querySelector(".opener").classList.add("hide");
-            }, 1250);
-            document.querySelector(".first").classList.add("first-ani");
-            document.querySelector(".second").classList.add("second-ani");
+            }, 1000);
+
           }
-        }, 1250);
+        }, 750);
+
+       setTimeout(() => {
+          document.querySelector(".first").classList.add("first-ani");
+          document.querySelector(".second").classList.add("second-ani");              
+        }, 600) ;
+
       });
 
       /*  setup  */
@@ -372,14 +410,23 @@
 
       /*  greeter  */
 
-      setTimeout(() => {
+      setTimeout(() => {      
         if (document.querySelector(".first").classList.contains("first-ani")) {
           let greet = document.querySelector(".greet-container");
+          let main = document.querySelector('.wrapper');
+          let nav = document.querySelector('.nav');
           greet.classList.add("hide");
+
           greet.style.height = 0;
         }
-      }, 4000);
+      }, 3000);
 
+      setTimeout(() => {
+        let main =document.querySelector('.wrapper');
+        let nav = document.querySelector('.nav');
+          main.classList.remove('hide');
+          nav.classList.remove('hide'); 
+      }, 4000);
       /* side-nav */
 
       document.querySelector(".side-button").addEventListener("click", () => {

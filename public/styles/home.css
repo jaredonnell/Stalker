@@ -231,6 +231,7 @@ body {
 /* greeter */
 
 .greet-container {
+  position:fixed;
   height: 100dvh;
   width: 100dvw;
   background-color: transparent;
@@ -704,9 +705,35 @@ select::-webkit-scrollbar {
     color:#FFC6C6;
     border: 1px solid #FFC6C6;
     border-radius: 5px;
+    transition: all ease .5s;
+    cursor: pointer;
+}
+
+#filter-sub:hover {
+    color: white;
+    border: 1px solid white;
 }
 
 .option-title {
     font-size: 2.5rem;
     color:#FFC6C6;
+}
+
+/* cards */
+
+.card-wrap {
+    min-width: 90vw;
+    justify-self: center;
+}
+
+.test {
+    height: 50px;
+    background-color: transparent;
+    border:3px solid #FFC6C6;
+}
+
+.nav,
+.wrapper,
+#overlay {
+    transition: all ease .5s;
 }
