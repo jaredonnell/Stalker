@@ -11,6 +11,10 @@ body {
     margin: 0;
 }
 
+body::-webkit-scrollbar {
+    width: 0;
+}
+
 .jost-head {
   font-family: "Jost", sans-serif;
   font-optical-sizing: auto;
@@ -238,6 +242,7 @@ body {
   display: flex;
   flex-direction: column;
   transition: all .5s ease-in;
+  overflow: hidden;
 }
 
 .greet {
@@ -305,7 +310,7 @@ body {
 /* setup */
 
 .show-link {
-    z-index: 2;
+    z-index: 5;
 }
 
 .q-container {
@@ -724,16 +729,28 @@ select::-webkit-scrollbar {
 .card-wrap {
     min-width: 90vw;
     justify-self: center;
-}
-
-.test {
-    height: 50px;
-    background-color: transparent;
-    border:3px solid #FFC6C6;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .nav,
 .wrapper,
-#overlay {
+#overlay,
+.card-wrap {
     transition: all ease .5s;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+}
+
+.main {
+    display: flex;
+}
+
+.favorite {
+    position: relative;
 }

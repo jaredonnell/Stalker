@@ -172,7 +172,7 @@
       <!--Main Content-->
 
       <div class="wrapper hide">
-        <% if (profile[0].stock_pref === 'Equities' || profile[0].stock_pref ==='Index' || profile[0].stock_pref === 'ETFs') { %>
+        <% if (profile[0].stock_pref === 'Equities' || profile[0].stock_pref === 'Index' || profile[0].stock_pref === 'ETFs') { %>
 
         <div class="filter">
           <form action="/filter" method="GET">
@@ -282,16 +282,16 @@
         <div class="option-title jost-head">
           <h1><%= profile[0].stock_pref %></h1>
         </div>
-      </div>
 
-      <!--cards-->
+        <!--cards-->
 
-      <div class="card-wrap">
+      <div class="card-wrap hide">
+        <div class="favorite">
+          <p class="jost">+ Favorite</p>
+        </div>
         <div class="card">
           <div class="main">
-            <div class="logo">
-
-            </div>
+            <div class="logo"></div>
             <div class="card-title">
               <h3 class="jost-head">CRP</h3>
               <p class="jost">Corp Co.</p>
@@ -304,18 +304,18 @@
               <h3 class="jost">Volume:</h3>
               <h3 class="jost">11324437</h3>
             </div>
-            <div class="indicator">
-
-            </div>
+            <div class="indicator"></div>
           </div>
-          <div class="graph">
-
-          </div>
+          <div class="graph"></div>
           <div class="expander">
-            <img src="./images/dwn_carrot.png" alt="">
+            <img src="./images/dwn_carrot.png" alt="" />
           </div>
         </div>
       </div>
+        
+      </div>
+
+      
 
       <ul class="circles">
         <li></li>
@@ -351,15 +351,13 @@
             setTimeout(() => {
               document.querySelector(".opener").classList.add("hide");
             }, 1000);
-
           }
         }, 750);
 
-       setTimeout(() => {
+        setTimeout(() => {
           document.querySelector(".first").classList.add("first-ani");
-          document.querySelector(".second").classList.add("second-ani");              
-        }, 600) ;
-
+          document.querySelector(".second").classList.add("second-ani");
+        }, 600);
       });
 
       /*  setup  */
@@ -380,6 +378,7 @@
         });
 
         document.querySelector(".sub").classList.add("show-link");
+       
       }
 
       setTimeout(() => {
@@ -410,11 +409,11 @@
 
       /*  greeter  */
 
-      setTimeout(() => {      
+      setTimeout(() => {
         if (document.querySelector(".first").classList.contains("first-ani")) {
           let greet = document.querySelector(".greet-container");
-          let main = document.querySelector('.wrapper');
-          let nav = document.querySelector('.nav');
+          let main = document.querySelector(".wrapper");
+          let nav = document.querySelector(".nav");
           greet.classList.add("hide");
 
           greet.style.height = 0;
@@ -422,11 +421,19 @@
       }, 3000);
 
       setTimeout(() => {
-        let main =document.querySelector('.wrapper');
-        let nav = document.querySelector('.nav');
-          main.classList.remove('hide');
-          nav.classList.remove('hide'); 
+        let main = document.querySelector(".wrapper");
+        let nav = document.querySelector(".nav");
+        let cards = document.querySelector(".card-wrap");
+        main.classList.remove("hide");
+        nav.classList.remove("hide");
+        cards.classList.remove("hide");
+        setTimeout(() => {
+          if (!cards.classList.contains('hide')) {
+           cards.classList.add('show-link'); 
+          }
+        }, 100)
       }, 4000);
+
       /* side-nav */
 
       document.querySelector(".side-button").addEventListener("click", () => {
@@ -442,6 +449,38 @@
           document.querySelector(".side-button").classList.remove("nav-hide");
           document.getElementById("overlay").classList.remove("show-overlay");
         }, 400);
+      });
+
+      document.getElementById("overlay").addEventListener("click", () => {
+        document.querySelector(".side-nav").classList.add("nav-hide");
+
+        setTimeout(() => {
+          document.querySelector(".side-button").classList.remove("nav-hide");
+          document.getElementById("overlay").classList.remove("show-overlay");
+        }, 400);
+      });
+
+      document.addEventListener("mousemove", function (event) {
+        let mousex = event.clientX;
+
+        if (event.clientX <= 20) {
+          document.querySelector(".side-nav").classList.remove("nav-hide");
+          document.querySelector(".side-button").classList.add("nav-hide");
+          document.getElementById("overlay").classList.add("show-overlay");
+
+          document.querySelector(".closer").addEventListener("click", () => {
+            document.querySelector(".side-nav").classList.add("nav-hide");
+
+            setTimeout(() => {
+              document
+                .querySelector(".side-button")
+                .classList.remove("nav-hide");
+              document
+                .getElementById("overlay")
+                .classList.remove("show-overlay");
+            }, 400);
+          });
+        }
       });
 
       /* side-nav links */
