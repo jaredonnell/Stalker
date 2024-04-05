@@ -6,6 +6,7 @@ import bodyParser from "body-parser";
 
 const app = express();
 const port = 3000;
+const api_key = '46acf3ff0eac49e385eb6e756b7b7e4e'
 
 // const config = {
 //   type: 'sparkline',
@@ -168,10 +169,6 @@ app.post("/login", async (req, res) => {
           `SELECT * FROM ${profile[0].stock_pref.toLowerCase()}`
         );
 
-        // if (profile[0].stock_pref === null) {
-        //   startQuestion = true;
-        // }
-
         /* filter options config */
 
         let countries = [];
@@ -213,10 +210,22 @@ app.post("/login", async (req, res) => {
           currency_group = [...new Set(currency_group)];
         }
 
+        /* API calls */
+
+          let stocks = [];
+          for (let i = 0; i < 5; i++) {
+           stocks.push(preferred_stocks[i].symbol[Math.floor(Math.random() * preferred_stocks.length)]);
+          }
+
+        const stock_data = await axios.get('https://api.twelvedata.com/time_series?symbol=AAPL&interval=1min&apikey=' + api_key)
+        console.log(stock_data);
+
         res.render("home.ejs", {
           profile: profile,
           setup: startQuestion,
           preferred_stocks: preferred_stocks,
+          stock_data: stock_data.data,
+          stocks: stocks,
           countries: countries,
           currencies: currencies,
           exchanges: exchanges,
@@ -311,6 +320,7 @@ app.post("/user-setup", async (req, res) => {
     profile[0].stock_pref === "Index" ||
     profile[0].stock_pref === "ETFs"
   ) {
+
     for (let i = 0; i < preferred_stocks.length; i++) {
       countries.push(preferred_stocks[i].country);
       exchanges.push(preferred_stocks[i].exchange);
@@ -320,7 +330,9 @@ app.post("/user-setup", async (req, res) => {
     countries = [...new Set(countries)];
     currencies = [...new Set(currencies)];
     exchanges = [...new Set(exchanges)];
+
   } else if (profile[0].stock_pref === "Crypto") {
+
     for (let i = 0; i < preferred_stocks.length; i++) {
       currency_base.push(preferred_stocks[i].currency_base);
       currency_quote.push(preferred_stocks[i].currency_quote);
@@ -328,7 +340,9 @@ app.post("/user-setup", async (req, res) => {
 
     currency_base = [...new Set(currency_base)];
     currency_quote = [...new Set(currency_quote)];
+
   } else if (profile[0].stock_pref === "Forex") {
+
     for (let i = 0; i < preferred_stocks.length; i++) {
       currency_base.push(preferred_stocks[i].currency_base);
       currency_group.push(preferred_stocks[i].currency_group);
@@ -336,6 +350,7 @@ app.post("/user-setup", async (req, res) => {
 
     currency_base = [...new Set(currency_base)];
     currency_group = [...new Set(currency_group)];
+
   }
 
   console.log(profile[0]);

@@ -735,6 +735,10 @@ select::-webkit-scrollbar {
     align-items: center;
 }
 
+.card-wrap * {
+    color:#FFC6C6
+}
+
 .nav,
 .wrapper,
 #overlay,
@@ -745,13 +749,55 @@ select::-webkit-scrollbar {
 .card {
     display: flex;
     flex-direction: column;
-    width: 100%;
+    width: 95%;
+    border: 3px solid #FFC6C6;
+    border-radius: 15px;
 }
 
 .main {
     display: flex;
+    justify-content: space-evenly;
 }
 
 .favorite {
     position: relative;
+    align-self: flex-end;
+    margin-right: 150px;
+    cursor: pointer;
+}
+
+.favorite p {
+transition: all ease .3s;
+    
+}
+
+.favorite p:hover {
+    color:white;
+}
+
+.card .logo {
+    height: 50px;
+    width: 50px;
+    align-self: center;
+}
+
+.indicator {
+    height: 25px;
+    width: 25px;
+    border-radius: 50%;
+    background-color: rgb(98, 236, 98);
+    align-self: center;
+}
+
+.graph {
+    display: flex;
+    justify-content: center;
+}
+
+.graph > img {
+    width: 80%;
+}
+
+.test {
+    color: rgb(255, 106, 106)
 }
