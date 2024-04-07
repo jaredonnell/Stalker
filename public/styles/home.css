@@ -795,9 +795,5 @@ transition: all ease .3s;
 }
 
 .graph > img {
-    width: 80%;
-}
-
-.test {
-    color: rgb(255, 106, 106)
+    width: 75%;
 }

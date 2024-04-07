@@ -218,7 +218,6 @@ app.post("/login", async (req, res) => {
           }
 
         const stock_data = await axios.get('https://api.twelvedata.com/time_series?symbol=AAPL&interval=1min&apikey=' + api_key)
-        console.log(stock_data);
 
         res.render("home.ejs", {
           profile: profile,
