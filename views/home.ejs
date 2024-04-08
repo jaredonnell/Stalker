@@ -354,7 +354,9 @@
                     data: [
 
                     <% for (let i = 0; i < stock_data.values.length; i++) { %>
+
                       ['<%= stock_data.values[i].datetime %>', <%= stock_data.values[i].close %>],
+
                   <%  } %>
 
                     ].map(([d,y]) => ({x:new Date(d).getTime(),y})),
@@ -438,7 +440,7 @@
             }&backgroundColor=transparent&width=600&height=300&devicePixelRatio=1.0&format=png&version=3" alt="">
           </div>
           <div class="expander">
-            <img src="./images/dwn_carrot.png" alt="" />
+            <img src="./images/dwn_carrot.png" class="chart" alt="" />
           </div>
         </div>
       </div>
@@ -632,6 +634,14 @@
           });
         });
       });
+
+    /* card expander */
+
+      document.querySelector('.expander').addEventListener('click', () => {
+        document.querySelector('.graph').classList.toggle('collapse');
+        document.querySelector('.chart').classList.toggle('collapse');
+      })
+
     </script>
   </body>
 </html>
