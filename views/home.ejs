@@ -309,16 +309,16 @@
             <div class="indicator"></div>
           </div>
           <div class="graph">
-            <img src="https://quickchart.io/chart?chart={
+            <img class="chart" src="https://quickchart.io/chart?chart={
               type: 'ohlc',
               data: {
                 datasets: [
                   {
-                    label: 'AAPL',
+                    label: '',
                     yAxisID: 'y1',
                     data: [
 
-                      <% for (let i = 0; i < stock_data.values.length; i++) { %>
+                      <% for (let i = 0; i < stock_data.values.length - 5; i++) { %>
                         ['<%= stock_data.values[i].datetime %>', <%= stock_data.values[i].open %>, <%= stock_data.values[i].high %>, <%= stock_data.values[i].low %>, <%= stock_data.values[i].close %> ],                         
                     <% } %>
 
@@ -337,7 +337,7 @@
                     label: 'Volume',
                     data: [
 
-                      <% for (let i = 0; i < stock_data.values.length; i++) { %>
+                      <% for (let i = 0; i < stock_data.values.length - 5; i++) { %>
                         ['<%= stock_data.values[i].datetime %>', <%= stock_data.values[i].volume %>],
                 <%  } %>
 
@@ -353,9 +353,9 @@
                     label: 'SMA',
                     data: [
 
-                    <% for (let i = 0; i < stock_data.values.length; i++) { %>
+                    <% for (let i = 0; i < stock_data.values.length - 5; i++) { %>
 
-                      ['<%= stock_data.values[i].datetime %>', <%= stock_data.values[i].close %>],
+                      ['<%= stock_data.values[i].datetime %>', <%= averages[i] %>],
 
                   <%  } %>
 
@@ -364,28 +364,7 @@
                 ],
               },
               options: {
-                scales:{
-                  yAxes: [
-                    {
-                      ticks: {
-                        beginAtZero: true,
-                        fontFamily: 'Mono',
-                        fontColor: 'black',
-                      },
-                    },
-                  ],
-                  
-                  xAxes: [
-                    {
-                      ticks: {
-              
-                        fontFamily: 'Serif',
-                        fontStyle: 'italic',
-                        fontColor: 'pink',
-                      },
-                    },
-                  ],
-                  
+                scales:{                
                   x:{
                     adapters: {
                       date: {
@@ -403,6 +382,9 @@
                         month: 'MMM d',
                       }
                     },
+                    ticks: {
+                      display: false
+                    },
                   },
                   y1: {
                     stack: 'stockChart',
@@ -411,9 +393,7 @@
                     grid: {
                       display: false
                     },
-                    
-                    },
-                   
+                  },           
                   y2: {
                     display: false,
                     stack: 'stockChart',
@@ -430,17 +410,14 @@
                   },
                   title: {
                     display: false,
-                    text: 'MSFT',
-                    font: {
-                      size: 20,
-                    },
                   },
                 },
               },
             }&backgroundColor=transparent&width=600&height=300&devicePixelRatio=1.0&format=png&version=3" alt="">
+            <p class="jost">Time Frame: 30min</p>
           </div>
           <div class="expander">
-            <img src="./images/dwn_carrot.png" class="chart" alt="" />
+            <img src="./images/dwn_carrot.png" alt="" />
           </div>
         </div>
       </div>
@@ -638,8 +615,9 @@
     /* card expander */
 
       document.querySelector('.expander').addEventListener('click', () => {
-        document.querySelector('.graph').classList.toggle('collapse');
-        document.querySelector('.chart').classList.toggle('collapse');
+        let g = document.querySelector('.graph');
+        g.classList.toggle('collapse');
+        void g.offsetWidth;
       })
 
     </script>

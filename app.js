@@ -217,13 +217,27 @@ app.post("/login", async (req, res) => {
            stocks.push(preferred_stocks[i].symbol[Math.floor(Math.random() * preferred_stocks.length)]);
           }
 
-        const stock_data = await axios.get('https://api.twelvedata.com/time_series?symbol=AAPL&interval=1min&apikey=' + api_key)
+        const stock_data = await axios.get('https://api.twelvedata.com/time_series?symbol=AAPL&interval=1min&outputsize=35&apikey=' + api_key);
+
+        /* SMA calc */
+
+        let averages = [];
+
+        for (let i = 0; i < stock_data.data.values.length - 5; i++) {
+          let sum = 0
+          for (let j = i; j < i + 5; j++) {  
+            sum += Math.floor((stock_data.data.values[j].close) * 100) / 100 
+           }
+          let avg = Math.floor((sum / 5) * 100) / 100;
+          averages.push(avg) 
+        }
 
         res.render("home.ejs", {
           profile: profile,
           setup: startQuestion,
           preferred_stocks: preferred_stocks,
           stock_data: stock_data.data,
+          averages: averages,
           stocks: stocks,
           countries: countries,
           currencies: currencies,
