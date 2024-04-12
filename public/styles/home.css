@@ -781,6 +781,12 @@ transition: all ease .3s;
     align-self: center;
 }
 
+.card .logo > img {
+    height: 50px;
+    width: 50px;
+    overflow: hidden;
+}
+
 .indicator {
     height: 25px;
     width: 25px;
@@ -822,4 +828,47 @@ transition: all ease .3s;
 .expander > img {
     height: 100%;
     width: 100%;
+}
+
+.legend {
+    display: flex;
+    justify-content: space-between;
+    width: 75%;
+    margin-top: 15px;
+}
+
+.legend span {
+    margin: 0 10px;
+}
+
+.sma,
+.topBand,
+.lowBand {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.sma > div {
+    height: 15px;
+    width: 15px;
+    background-color: pink;
+    border: 2px solid rgb(255, 178, 191);
+    border-radius: 5px;  
+}
+
+.topBand > div {
+    height: 15px;
+    width: 15px;
+    background-color: rgba(103, 103, 255, 0.822);
+    border: 2px solid rgba(76, 76, 255, 0.822);
+    border-radius: 5px;
+}
+
+.lowBand > div {
+    height: 15px;
+    width: 15px;
+    background-color: rgba(255, 255, 137, 0.801);
+    border: 2px solid rgba(255, 255, 73, 0.801);
+    border-radius: 5px;
 }

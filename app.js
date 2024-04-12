@@ -4,6 +4,7 @@ import sqlite3 from "sqlite3";
 import axios from "axios";
 import bodyParser from "body-parser";
 import QuickChart from "quickchart-js";
+import sharp from 'sharp'
 
 const app = express();
 const port = 3000;
@@ -18,6 +19,31 @@ const db = new sqlite3.Database("./data/stalker.db", (err) => {
 });
 
 let check = true;
+
+async function makeTransparent(imageUrl, backgroundColor = [255, 255, 255]) {
+  try {
+      // Download image
+      const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+      const imageData = Buffer.from(response.data, 'binary');
+
+      // Convert image
+      const image = sharp(imageData);
+      const metadata = await image.metadata();
+
+      // Ensure image has an alpha channel (RGBA)
+      if (metadata.channels !== 4) {
+          image.png({ force: true });
+      }
+
+      // Make background transparent
+      const transparentImageData = await image.flatten({ background: backgroundColor }).toBuffer();
+
+      return transparentImageData;
+  } catch (error) {
+      console.error('Error:', error);
+      throw error;
+  }
+}
 
 async function select(query, params) {
   try {
@@ -218,6 +244,15 @@ app.post("/login", async (req, res) => {
             api_key
         );
 
+        const stock_quote = await axios.get('https://api.twelvedata.com/quote?symbol=AAPL&interval=30min&dp=3&apikey=' + api_key);
+
+        const stock_logo = await axios.get('https://api.twelvedata.com/logo?symbol=AAPL&apikey=' + api_key);
+        console.log(stock_logo.data.url);
+        const blank_logo = makeTransparent(`${stock_logo.data.url}`);
+          
+
+        const realPrice = await axios.get('https://api.twelvedata.com/price?symbol=AAPL&dp=2&apikey=' + api_key);
+
         /* calculations */
 
         let averages = [];
@@ -301,6 +336,8 @@ app.post("/login", async (req, res) => {
           res.status(500);
         }
 
+        /* data allocation for config */
+
         const ohlcData = {
           values: [],
         };
@@ -337,6 +374,8 @@ app.post("/login", async (req, res) => {
           const sma = averages[index];
           return [datetime, sma];
         });
+
+        /* chart config */
 
         const chart = new QuickChart();
         await chart.setConfig({
@@ -384,7 +423,7 @@ app.post("/login", async (req, res) => {
               {
                 type: "line",
                 yAxisID: "y1",
-                borderColor: "blue",
+                borderColor: "rgba(103, 103, 255, 0.822)",
                 backgroundColor: "",
                 borderWidth: 2,
                 pointRadius: 0,
@@ -397,7 +436,7 @@ app.post("/login", async (req, res) => {
               {
                 type: "line",
                 yAxisID: "y1",
-                borderColor: "yellow",
+                borderColor: "rgba(255, 255, 137, 0.801)",
                 backgroundColor: "",
                 borderWidth: 2,
                 pointRadius: 0,
@@ -476,19 +515,16 @@ app.post("/login", async (req, res) => {
           .setHeight(300)
           .setWidth(600);
         const url = await chart.getUrl();
-        console.log(url);
-
-        console.log(chart);
 
         res.render("home.ejs", {
           profile: profile,
           setup: startQuestion,
           preferred_stocks: preferred_stocks,
           stock_data: stock_data.data,
+          stock_quote: stock_quote.data,
+          logo: blank_logo,
+          realPrice: realPrice.data.price,
           url: url,
-          averages: averages,
-          topBand: topBand,
-          lowBand: lowBand,
           stocks: stocks,
           countries: countries,
           currencies: currencies,

@@ -292,24 +292,42 @@
         <div class="card">
           <div class="main">
             <div class="logo">
-              <img src="" alt="">
+              <img src="<%= logo %>" alt="">
             </div>
             <div class="card-title">
-              <h3 class="jost-head">CRP</h3>
-              <p class="jost">Corp Co.</p>
+              <h3 class="jost-head"><%= stock_quote.symbol %></h3>
+              <p class="jost"><%= stock_quote.name %></p>
             </div>
             <div class="change">
-              <h3 class="jost">1.96%</h3>
-              <h3 class="jost">$196.44</h3>
+              <h3 class="jost"><%= stock_quote.percent_change %>%</h3>
+              <h3 class="jost"><%= realPrice %></h3>
             </div>
             <div class="volume">
               <h3 class="jost">Volume:</h3>
-              <h3 class="jost">11324437</h3>
+              <h3 class="jost"><%= stock_data.values[stock_data.values.length - 1].volume %></h3>
             </div>
+            <% if (stock_quote.percent_change < 0) { %>
+              <div class="indicator" style="background-color: rgb(255,106,106);"></div> 
+           <% } else { %>
             <div class="indicator"></div>
+            <% } %>
           </div>
           <div class="graph">
             <img class="chart" src="<%= url %>" alt="">
+            <div class="legend">
+              <div class="sma">
+                <div></div>
+                <p class="jost"><span>=</span> SMA</p>
+              </div>
+              <div class="topBand">
+                <div></div>
+                <p class="jost"><span>=</span> BOLL Top Band</p>
+              </div>
+              <div class="lowBand">
+                <div></div>
+                <p class="jost"><span>=</span> BOLL Low Band</p>
+              </div>
+            </div>
             <p class="jost">Time Frame: 30min</p>
           </div>
           <div class="expander">
