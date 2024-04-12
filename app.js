@@ -3,19 +3,11 @@ import session from "express-session";
 import sqlite3 from "sqlite3";
 import axios from "axios";
 import bodyParser from "body-parser";
+import QuickChart from "quickchart-js";
 
 const app = express();
 const port = 3000;
-const api_key = '46acf3ff0eac49e385eb6e756b7b7e4e'
-
-// const config = {
-//   type: 'sparkline',
-//   data: {
-//     datasets: [{
-//       data: ['12.93297', '13.22083', '13.96894', '14.14472', '14.33402', '14.00781', '13.10215', '12.46830', '11.78568', '10.96955', '10.97333', '11.40577', '11.21083', '11.12855', '11.45648', '11.80963', '12.39805', '13.03173', '11.91138', '10.51463', '9.01044', '9.14316', '9.28610', '9.80866', '10.44900', '10.39581', '10.62092', '10.86336', '11.67024', '11.84780']
-//     }]
-//   }
-// }
+const api_key = "46acf3ff0eac49e385eb6e756b7b7e4e";
 
 const db = new sqlite3.Database("./data/stalker.db", (err) => {
   if (err) {
@@ -212,32 +204,291 @@ app.post("/login", async (req, res) => {
 
         /* API calls */
 
-          let stocks = [];
-          for (let i = 0; i < 5; i++) {
-           stocks.push(preferred_stocks[i].symbol[Math.floor(Math.random() * preferred_stocks.length)]);
-          }
+        let stocks = [];
+        for (let i = 0; i < 5; i++) {
+          stocks.push(
+            preferred_stocks[i].symbol[
+              Math.floor(Math.random() * preferred_stocks.length)
+            ]
+          );
+        }
 
-        const stock_data = await axios.get('https://api.twelvedata.com/time_series?symbol=AAPL&interval=1min&outputsize=35&apikey=' + api_key);
+        const stock_data = await axios.get(
+          "https://api.twelvedata.com/time_series?symbol=AAPL&interval=1min&outputsize=35&apikey=" +
+            api_key
+        );
 
-        /* SMA calc */
+        /* calculations */
 
         let averages = [];
+        let diff = {
+          diffSets: [],
+        };
+        let intervals = {
+          prices: [],
+        };
+        let deviation = [];
+        let topBand = [];
+        let lowBand = [];
+
+        try {
+          async function BOLL() {
+            /* mean calc + price storing */
+
+            for (let i = 0; i < stock_data.data.values.length - 5; i++) {
+              let sum = 0;
+              let prices = [];
+
+              for (let j = i; j < i + 5; j++) {
+                sum += parseFloat(stock_data.data.values[j].close);
+                prices.push(
+                  parseFloat(stock_data.data.values[j].close).toFixed(5)
+                );
+              }
+
+              intervals.prices.push(prices);
+              let avg = (sum / 5).toFixed(5);
+              averages.push(avg);
+            }
+
+            /* diff calc (price - mean) and square */
+
+            for (let i = 0; i < averages.length; i++) {
+              let d = [];
+              for (let k = 0; k < intervals.prices[i].length; k++) {
+                let difference = (intervals.prices[i][k] - averages[i]).toFixed(
+                  5
+                );
+                let dSquared = (difference * difference).toFixed(5);
+                d.push(dSquared);
+              }
+              diff.diffSets.push(d);
+            }
+
+            /* variance calc (sum of squares / prices) and std calc (root of variance) */
+
+            for (let i = 0; i < diff.diffSets.length; i++) {
+              let squareSum = 0;
+              for (let j = 0; j < diff.diffSets[i].length; j++) {
+                squareSum += parseFloat(diff.diffSets[i][j]);
+              }
+              let variance = squareSum / 5;
+              deviation.push(Math.sqrt(variance).toFixed(5));
+            }
+
+            for (let i = 0; i < deviation.length; i++) {
+              topBand.push(
+                (
+                  parseFloat(deviation[i]) * 2 +
+                  parseFloat(averages[i])
+                ).toFixed(5)
+              );
+              lowBand.push(
+                (
+                  parseFloat(averages[i]) -
+                  parseFloat(deviation[i]) * 2
+                ).toFixed(5)
+              );
+            }
+          }
+
+          await BOLL();
+
+          console.log("chart data sent successfuly");
+          console.log(topBand.length);
+        } catch (error) {
+          console.log(error);
+          res.status(500);
+        }
+
+        const ohlcData = {
+          values: [],
+        };
+
+        const volumeData = {
+          values: [],
+        };
 
         for (let i = 0; i < stock_data.data.values.length - 5; i++) {
-          let sum = 0
-          for (let j = i; j < i + 5; j++) {  
-            sum += Math.floor((stock_data.data.values[j].close) * 100) / 100 
-           }
-          let avg = Math.floor((sum / 5) * 100) / 100;
-          averages.push(avg) 
+          const { datetime, open, high, low, close } =
+            stock_data.data.values[i];
+          ohlcData.values.push([datetime, open, high, low, close]);
         }
+
+        for (let i = 0; i < stock_data.data.values.length - 5; i++) {
+          const { datetime, volume } = stock_data.data.values[i];
+          volumeData.values.push([datetime, volume]);
+        }
+
+        const lBandData = stock_data.data.values.map((value, index) => {
+          const datetime = value.datetime;
+          const lBandValue = lowBand[index];
+          return [datetime, lBandValue];
+        });
+
+        const uBandData = stock_data.data.values.map((value, index) => {
+          const datetime = value.datetime;
+          const uBandValue = topBand[index];
+          return [datetime, uBandValue];
+        });
+
+        const smaData = stock_data.data.values.map((value, index) => {
+          const datetime = value.datetime;
+          const sma = averages[index];
+          return [datetime, sma];
+        });
+
+        const chart = new QuickChart();
+        await chart.setConfig({
+          type: "ohlc",
+          data: {
+            datasets: [
+              {
+                yAxisID: "y1",
+                data: ohlcData.values.map(([d, o, h, l, c]) => ({
+                  x: new Date(d).getTime(),
+                  o,
+                  h,
+                  l,
+                  c,
+                })),
+                color: {
+                  up: "rgb(98, 236, 98)",
+                  down: "rgb(255,106,106)",
+                  unchanged: "white",
+                },
+              },
+              {
+                type: "bar",
+                yAxisID: "y2",
+                backgroundColor: "pink",
+                label: "Volume",
+                data: volumeData.values.map(([d, y]) => ({
+                  x: new Date(d).getTime(),
+                  y,
+                })),
+              },
+              {
+                type: "line",
+                yAxisID: "y1",
+                borderColor: "pink",
+                backgroundColor: "",
+                borderWidth: 2,
+                pointRadius: 0,
+                label: "SMA",
+                data: smaData.map(([d, y]) => ({
+                  x: new Date(d).getTime(),
+                  y,
+                })),
+              },
+              {
+                type: "line",
+                yAxisID: "y1",
+                borderColor: "blue",
+                backgroundColor: "",
+                borderWidth: 2,
+                pointRadius: 0,
+                label: "Upper Band",
+                data: uBandData.map(([d, y]) => ({
+                  x: new Date(d).getTime(),
+                  y,
+                })),
+              },
+              {
+                type: "line",
+                yAxisID: "y1",
+                borderColor: "yellow",
+                backgroundColor: "",
+                borderWidth: 2,
+                pointRadius: 0,
+                label: "Lower Band",
+                data: lBandData.map(([d, y]) => ({
+                  x: new Date(d).getTime(),
+                  y,
+                })),
+              },
+            ],
+          },
+          options: {
+            scales: {
+              x: {
+                adapters: {
+                  date: {
+                    zone: "UTC-4",
+                  },
+                },
+                grid: {
+                  display: false,
+                },
+                time: {
+                  unit: "day",
+                  stepSize: 1,
+                  displayFormats: {
+                    day: "MMM d",
+                    month: "MMM d",
+                  },
+                },
+                ticks: {
+                  display: false,
+                },
+              },
+              y1: {
+                stack: "stockChart",
+                stackWeight: 10000000,
+                weight: 2,
+                grid: {
+                  display: false,
+                },
+                ticks: {
+                  display: true,
+                  font: {
+                    size: 10,
+                  },
+                },
+              },
+              y2: {
+                display: false,
+                stack: "stockChart",
+                stackWeight: 1,
+                weight: 1,
+                grid: {
+                  display: false,
+                },
+                ticks: {
+                  display: false,
+                },
+              },
+            },
+            plugins: {
+              legend: {
+                display: false,
+              },
+              title: {
+                display: false,
+              },
+            },
+          },
+        });
+
+        await chart
+          .setVersion("3.4.0")
+          .setBackgroundColor("transparent")
+          .setHeight(300)
+          .setWidth(600);
+        const url = await chart.getUrl();
+        console.log(url);
+
+        console.log(chart);
 
         res.render("home.ejs", {
           profile: profile,
           setup: startQuestion,
           preferred_stocks: preferred_stocks,
           stock_data: stock_data.data,
+          url: url,
           averages: averages,
+          topBand: topBand,
+          lowBand: lowBand,
           stocks: stocks,
           countries: countries,
           currencies: currencies,
@@ -333,7 +584,6 @@ app.post("/user-setup", async (req, res) => {
     profile[0].stock_pref === "Index" ||
     profile[0].stock_pref === "ETFs"
   ) {
-
     for (let i = 0; i < preferred_stocks.length; i++) {
       countries.push(preferred_stocks[i].country);
       exchanges.push(preferred_stocks[i].exchange);
@@ -343,9 +593,7 @@ app.post("/user-setup", async (req, res) => {
     countries = [...new Set(countries)];
     currencies = [...new Set(currencies)];
     exchanges = [...new Set(exchanges)];
-
   } else if (profile[0].stock_pref === "Crypto") {
-
     for (let i = 0; i < preferred_stocks.length; i++) {
       currency_base.push(preferred_stocks[i].currency_base);
       currency_quote.push(preferred_stocks[i].currency_quote);
@@ -353,9 +601,7 @@ app.post("/user-setup", async (req, res) => {
 
     currency_base = [...new Set(currency_base)];
     currency_quote = [...new Set(currency_quote)];
-
   } else if (profile[0].stock_pref === "Forex") {
-
     for (let i = 0; i < preferred_stocks.length; i++) {
       currency_base.push(preferred_stocks[i].currency_base);
       currency_group.push(preferred_stocks[i].currency_group);
@@ -363,7 +609,6 @@ app.post("/user-setup", async (req, res) => {
 
     currency_base = [...new Set(currency_base)];
     currency_group = [...new Set(currency_group)];
-
   }
 
   console.log(profile[0]);
