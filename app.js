@@ -9,6 +9,7 @@ import sharp from 'sharp'
 const app = express();
 const port = 3000;
 const api_key = "46acf3ff0eac49e385eb6e756b7b7e4e";
+const clientId = "0cd3549306753d4"
 
 const db = new sqlite3.Database("./data/stalker.db", (err) => {
   if (err) {
@@ -20,27 +21,38 @@ const db = new sqlite3.Database("./data/stalker.db", (err) => {
 
 let check = true;
 
-async function makeTransparent(imageUrl, backgroundColor = [255, 255, 255]) {
+async function bgRemove (url, makeTransparent = false, clientId) {
   try {
-      // Download image
-      const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
-      const imageData = Buffer.from(response.data, 'binary');
+      // Fetch the image
+      const response = await axios.get(url, { responseType: 'arraybuffer' });
+      const buffer = Buffer.from(response.data, 'binary');
 
-      // Convert image
-      const image = sharp(imageData);
-      const metadata = await image.metadata();
-
-      // Ensure image has an alpha channel (RGBA)
-      if (metadata.channels !== 4) {
-          image.png({ force: true });
+      // Process the image based on the provided options
+      let image = sharp(buffer);
+      if (makeTransparent) {
+          image = image.ensureAlpha();
       }
+      const processedBuffer = await image.png().toBuffer();
 
-      // Make background transparent
-      const transparentImageData = await image.flatten({ background: backgroundColor }).toBuffer();
+      const blob = new Blob([processedBuffer], { type: 'image/png' });
 
-      return transparentImageData;
+      // Upload the processed image to Imgur
+      const formData = new FormData();
+      formData.append('image', blob, { filename: 'processed_image.png' });
+
+      console.log(formData);
+
+      const uploadResponse = await axios.post('https://api.imgur.com/3/image', formData, {
+          headers: {
+              Authorization: `${clientId}`, // Replace with your Imgur Client ID
+              'Content-Type': `multipart/form-data; boundary=${formData._boundary}`
+          }
+      });
+
+      // Extract the URL of the uploaded image
+      return uploadResponse.data.data.link;
   } catch (error) {
-      console.error('Error:', error);
+      console.error('Error processing or uploading image:', error);
       throw error;
   }
 }
@@ -248,8 +260,11 @@ app.post("/login", async (req, res) => {
 
         const stock_logo = await axios.get('https://api.twelvedata.com/logo?symbol=AAPL&apikey=' + api_key);
         console.log(stock_logo.data.url);
-        const blank_logo = makeTransparent(`${stock_logo.data.url}`);
-          
+
+       const rawURL = stock_logo.data.url;
+       const transparent = true;
+       const logo = bgRemove(rawURL, transparent, clientId)
+
 
         const realPrice = await axios.get('https://api.twelvedata.com/price?symbol=AAPL&dp=2&apikey=' + api_key);
 
@@ -522,7 +537,7 @@ app.post("/login", async (req, res) => {
           preferred_stocks: preferred_stocks,
           stock_data: stock_data.data,
           stock_quote: stock_quote.data,
-          logo: blank_logo,
+          logo: logo,
           realPrice: realPrice.data.price,
           url: url,
           stocks: stocks,
