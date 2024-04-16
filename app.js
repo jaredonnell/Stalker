@@ -21,42 +21,6 @@ const db = new sqlite3.Database("./data/stalker.db", (err) => {
 
 let check = true;
 
-async function bgRemove (url, makeTransparent = false, clientId) {
-  try {
-      // Fetch the image
-      const response = await axios.get(url, { responseType: 'arraybuffer' });
-      const buffer = Buffer.from(response.data, 'binary');
-
-      // Process the image based on the provided options
-      let image = sharp(buffer);
-      if (makeTransparent) {
-          image = image.ensureAlpha();
-      }
-      const processedBuffer = await image.png().toBuffer();
-
-      const blob = new Blob([processedBuffer], { type: 'image/png' });
-
-      // Upload the processed image to Imgur
-      const formData = new FormData();
-      formData.append('image', blob, { filename: 'processed_image.png' });
-
-      console.log(formData);
-
-      const uploadResponse = await axios.post('https://api.imgur.com/3/image', formData, {
-          headers: {
-              Authorization: `${clientId}`, // Replace with your Imgur Client ID
-              'Content-Type': `multipart/form-data; boundary=${formData._boundary}`
-          }
-      });
-
-      // Extract the URL of the uploaded image
-      return uploadResponse.data.data.link;
-  } catch (error) {
-      console.error('Error processing or uploading image:', error);
-      throw error;
-  }
-}
-
 async function select(query, params) {
   try {
     const rows = await new Promise((resolve, reject) => {
@@ -261,9 +225,13 @@ app.post("/login", async (req, res) => {
         const stock_logo = await axios.get('https://api.twelvedata.com/logo?symbol=AAPL&apikey=' + api_key);
         console.log(stock_logo.data.url);
 
+        const logoProcess = await axios.get('http://localhost:3000/bg-remove?rawURL=' + `${stock_logo.data.url}`) // REMOVE BEFORE DEPLOY
+        console.log(logoProcess)
+
        const rawURL = stock_logo.data.url;
-       const transparent = true;
-       const logo = bgRemove(rawURL, transparent, clientId)
+/*        const transparent = true;
+       const logo = await bgRemove(rawURL, transparent, clientId)
+       console.log(logo) */;
 
 
         const realPrice = await axios.get('https://api.twelvedata.com/price?symbol=AAPL&dp=2&apikey=' + api_key);
@@ -537,7 +505,8 @@ app.post("/login", async (req, res) => {
           preferred_stocks: preferred_stocks,
           stock_data: stock_data.data,
           stock_quote: stock_quote.data,
-          logo: logo,
+/*           logo: logo */
+          rawURL: rawURL,
           realPrice: realPrice.data.price,
           url: url,
           stocks: stocks,
@@ -581,6 +550,38 @@ app.post("/login", async (req, res) => {
   }
 
   db.close();
+});
+
+app.get('/bg-remove', async (req, res) => {
+  async function processImage(imageData) {
+    try {
+        const processedImageData = await sharp(imageData)
+
+            .ensureAlpha()
+
+            .extractChannel('alpha')
+
+            .modulate({ alpha: 0 })
+
+            .composite([{ input: { create: { width: 1, height: 1, channels: 4, background: '#fff' } } }])
+            
+            .png()
+
+            .toBuffer();
+
+        const dataUrl = `data:image/png;base64,${processedImageData.toString('base64')}`;
+
+        return dataUrl;
+    } catch (error) {
+        console.error('Error processing image:', error);
+        throw error;
+    }
+  }
+
+  let rawURL = req.query.rawURL
+
+  let logo = await processImage(rawURL);
+  res.json({logo})
 });
 
 app.post("/user-setup", async (req, res) => {
