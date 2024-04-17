@@ -4,8 +4,8 @@ import sqlite3 from "sqlite3";
 import axios from "axios";
 import bodyParser from "body-parser";
 import QuickChart from "quickchart-js";
-import sharp from 'sharp';
-import cv from 'opencv4node'
+import Image from 'image-js';
+// const {Image} = require('image-js');
 
 const app = express();
 const port = 3000;
@@ -547,27 +547,35 @@ app.post("/login", async (req, res) => {
 
 app.get('/bg-remove', async (req, res) => {
 
-  const imageUrl = req.query.rawURL;
+
+  async function performEdgeDetection(imagePath) {
+    // Load the image
+    
+
+    // Convert the image to grayscale
+    const grayImage = image.grey();
+
+    // Perform edge detection using the Canny edge detection algorithm
+    const edgeImage = grayImage.cannyEdge();
+
+    // Save the resulting edge-detected image
+    const data_url = edgeImage.toDataURL();
+
+    console.log('Edge detection complete. Result saved as url');
+
+    return data_url;
+  }
+
 
   try {
-      // Fetch the image from the URL
-      const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
-      const imageData = Buffer.from(response.data, 'binary');
+  
+   const response = await axios.get(req.query.rawURL, {
+    responseType: 'arraybuffer'
+   });
 
-      // Load image using opencv4nodejs
-      const img = cv.imdecode(imageData);
+   const logo = await performEdgeDetection(Buffer.from(response.data));
+   res.json({logo});
 
-      // Perform background removal operations using OpenCV
-      // For demonstration, let's convert the image to grayscale
-      const grayImg = img.cvtColor(cv.COLOR_BGR2GRAY);
-
-      // Convert the processed image back to buffer
-      const processedImageData = cv.imencode('.png', grayImg).toString('base64');
-
-      // Set the Content-Type header
-      res.setHeader('Content-Type', 'image/png');
-      // Send the resulting image as a response
-      res.send(Buffer.from(processedImageData, 'base64'));
   } catch (error) {
       console.error('Error processing image:', error);
       res.status(500).send('Error processing image');
