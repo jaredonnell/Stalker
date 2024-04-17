@@ -4,12 +4,12 @@ import sqlite3 from "sqlite3";
 import axios from "axios";
 import bodyParser from "body-parser";
 import QuickChart from "quickchart-js";
-import sharp from 'sharp'
+import sharp from 'sharp';
+import cv from 'opencv4node'
 
 const app = express();
 const port = 3000;
 const api_key = "46acf3ff0eac49e385eb6e756b7b7e4e";
-const clientId = "0cd3549306753d4"
 
 const db = new sqlite3.Database("./data/stalker.db", (err) => {
   if (err) {
@@ -226,13 +226,7 @@ app.post("/login", async (req, res) => {
         console.log(stock_logo.data.url);
 
         const logoProcess = await axios.get('http://localhost:3000/bg-remove?rawURL=' + `${stock_logo.data.url}`) // REMOVE BEFORE DEPLOY
-        console.log(logoProcess)
-
-       const rawURL = stock_logo.data.url;
-/*        const transparent = true;
-       const logo = await bgRemove(rawURL, transparent, clientId)
-       console.log(logo) */;
-
+        console.log(logoProcess.data);
 
         const realPrice = await axios.get('https://api.twelvedata.com/price?symbol=AAPL&dp=2&apikey=' + api_key);
 
@@ -505,8 +499,7 @@ app.post("/login", async (req, res) => {
           preferred_stocks: preferred_stocks,
           stock_data: stock_data.data,
           stock_quote: stock_quote.data,
-/*           logo: logo */
-          rawURL: rawURL,
+          logoURL: logoProcess.data.logo,
           realPrice: realPrice.data.price,
           url: url,
           stocks: stocks,
@@ -553,35 +546,33 @@ app.post("/login", async (req, res) => {
 });
 
 app.get('/bg-remove', async (req, res) => {
-  async function processImage(imageData) {
-    try {
-        const processedImageData = await sharp(imageData)
 
-            .ensureAlpha()
+  const imageUrl = req.query.rawURL;
 
-            .extractChannel('alpha')
+  try {
+      // Fetch the image from the URL
+      const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+      const imageData = Buffer.from(response.data, 'binary');
 
-            .modulate({ alpha: 0 })
+      // Load image using opencv4nodejs
+      const img = cv.imdecode(imageData);
 
-            .composite([{ input: { create: { width: 1, height: 1, channels: 4, background: '#fff' } } }])
-            
-            .png()
+      // Perform background removal operations using OpenCV
+      // For demonstration, let's convert the image to grayscale
+      const grayImg = img.cvtColor(cv.COLOR_BGR2GRAY);
 
-            .toBuffer();
+      // Convert the processed image back to buffer
+      const processedImageData = cv.imencode('.png', grayImg).toString('base64');
 
-        const dataUrl = `data:image/png;base64,${processedImageData.toString('base64')}`;
-
-        return dataUrl;
-    } catch (error) {
-        console.error('Error processing image:', error);
-        throw error;
-    }
+      // Set the Content-Type header
+      res.setHeader('Content-Type', 'image/png');
+      // Send the resulting image as a response
+      res.send(Buffer.from(processedImageData, 'base64'));
+  } catch (error) {
+      console.error('Error processing image:', error);
+      res.status(500).send('Error processing image');
   }
 
-  let rawURL = req.query.rawURL
-
-  let logo = await processImage(rawURL);
-  res.json({logo})
 });
 
 app.post("/user-setup", async (req, res) => {
