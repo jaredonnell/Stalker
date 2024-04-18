@@ -4,7 +4,7 @@ import sqlite3 from "sqlite3";
 import axios from "axios";
 import bodyParser from "body-parser";
 import QuickChart from "quickchart-js";
-import Image from 'image-js';
+import sharp from "sharp";
 // const {Image} = require('image-js');
 
 const app = express();
@@ -57,6 +57,7 @@ async function insert(query, params) {
     throw err;
   }
 }
+
 
 app.use(
   session({
@@ -547,38 +548,65 @@ app.post("/login", async (req, res) => {
 
 app.get('/bg-remove', async (req, res) => {
 
+  async function imageProccess (imageURL) {
+    try {
+      const response = await axios.get(imageURL, {
+        responseType: 'arraybuffer'
+      });
 
-  async function performEdgeDetection(imagePath) {
-    // Load the image
-    
+      let image = await sharp(response.data);
 
-    // Convert the image to grayscale
-    const grayImage = image.grey();
+      const metadata = await image.metadata();
+      const hasAlpha = metadata.hasAlpha;
+      console.log(metadata);
 
-    // Perform edge detection using the Canny edge detection algorithm
-    const edgeImage = grayImage.cannyEdge();
+      if (!hasAlpha) {
+        image = image.png({alphaQuality: -1, force: true});
+        console.log('fuckyou')
+      }
 
-    // Save the resulting edge-detected image
-    const data_url = edgeImage.toDataURL();
+      const {data, info} = await image
+       .ensureAlpha()
+       .raw()
+       .toBuffer({resolveWithObject: true});
 
-    console.log('Edge detection complete. Result saved as url');
+      console.log({data, info});
 
-    return data_url;
+
+      for (let i = 0; i < data.length; i +=4) {
+        if (data[i] === 255 && data[i + 1] === 255 && data[i + 2] === 255) {
+          console.log('white pixel found: changing alpha')
+          data[i + 3] = 0;
+        }
+      }
+
+      const proccessedImage = await sharp(data, {raw: info}).toBuffer(); 
+      console.log('proccessedBuffer', proccessedImage)       
+
+      const proccessedURL = `data:image/png;base64,${proccessedImage.toString('base64')}`;
+
+      return proccessedURL;
+
+    } catch (error) {
+      console.log('error processing image', error);
+      throw error;
+    }
   }
 
-
   try {
-  
-   const response = await axios.get(req.query.rawURL, {
-    responseType: 'arraybuffer'
-   });
 
-   const logo = await performEdgeDetection(Buffer.from(response.data));
-   res.json({logo});
+    const rawURL = req.query.rawURL;
+
+    const logo = await imageProccess(rawURL);
+    // console.log('logo url: ', logo);
+
+    res.json({logo: logo});
 
   } catch (error) {
-      console.error('Error processing image:', error);
-      res.status(500).send('Error processing image');
+
+    console.error('error with request:', error);
+    res.status(500);
+
   }
 
 });
