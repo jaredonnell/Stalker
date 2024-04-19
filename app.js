@@ -513,7 +513,23 @@ app.post("/login", async (req, res) => {
         });
       } else {
         startQuestion = true;
-        res.render("home.ejs", { profile: profile, setup: startQuestion });
+        res.render("home.ejs", {
+          profile: profile,
+          setup: startQuestion,
+          preferred_stocks: preferred_stocks,
+          stock_data: stock_data.data,
+          stock_quote: stock_quote.data,
+          logoURL: logoProcess.data.logo,
+          realPrice: realPrice.data.price,
+          url: url,
+          stocks: stocks,
+          countries: countries,
+          currencies: currencies,
+          exchanges: exchanges,
+          currency_quote: currency_quote,
+          currency_base: currency_base,
+          currency_group: currency_group,
+        });
       }
 
       console.log("yup");
@@ -529,7 +545,24 @@ app.post("/login", async (req, res) => {
         [req.body.username]
       );
 
-      res.render("home.ejs", { profile: profile, setup: startQuestion });
+      res.render("home.ejs", {
+        profile: profile,
+        setup: startQuestion,
+        preferred_stocks: preferred_stocks,
+        stock_data: stock_data.data,
+        stock_quote: stock_quote.data,
+        logoURL: logoProcess.data.logo,
+        realPrice: realPrice.data.price,
+        url: url,
+        stocks: stocks,
+        countries: countries,
+        currencies: currencies,
+        exchanges: exchanges,
+        currency_quote: currency_quote,
+        currency_base: currency_base,
+        currency_group: currency_group,
+      });
+
     }
   } else {
     /* auth fail */
@@ -558,7 +591,6 @@ app.get('/bg-remove', async (req, res) => {
 
       const metadata = await image.metadata();
       const hasAlpha = metadata.hasAlpha;
-      console.log(metadata);
 
       if (!hasAlpha) {
         image = image.png({alphaQuality: -1, force: true});
@@ -570,18 +602,13 @@ app.get('/bg-remove', async (req, res) => {
        .raw()
        .toBuffer({resolveWithObject: true});
 
-      console.log({data, info});
-
-
       for (let i = 0; i < data.length; i +=4) {
         if (data[i] === 255 && data[i + 1] === 255 && data[i + 2] === 255) {
-          console.log('white pixel found: changing alpha')
           data[i + 3] = 0;
         }
       }
 
-      const proccessedImage = await sharp(data, {raw: info}).toBuffer(); 
-      console.log('proccessedBuffer', proccessedImage)       
+      const proccessedImage = await sharp(data, {raw: info}).png().toBuffer(); 
 
       const proccessedURL = `data:image/png;base64,${proccessedImage.toString('base64')}`;
 
@@ -598,7 +625,6 @@ app.get('/bg-remove', async (req, res) => {
     const rawURL = req.query.rawURL;
 
     const logo = await imageProccess(rawURL);
-    // console.log('logo url: ', logo);
 
     res.json({logo: logo});
 
