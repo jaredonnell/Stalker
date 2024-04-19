@@ -5,7 +5,6 @@ import axios from "axios";
 import bodyParser from "body-parser";
 import QuickChart from "quickchart-js";
 import sharp from "sharp";
-// const {Image} = require('image-js');
 
 const app = express();
 const port = 3000;
@@ -61,8 +60,7 @@ async function insert(query, params) {
 
 /* chart builder */
 
-async function BOLL(stock_data) {
-
+async function dataExtract(stock_data) {
   let averages = [];
   let diff = {
     diffSets: [],
@@ -82,9 +80,7 @@ async function BOLL(stock_data) {
 
     for (let j = i; j < i + 5; j++) {
       sum += parseFloat(stock_data.values[j].close);
-      prices.push(
-        parseFloat(stock_data.values[j].close).toFixed(5)
-      );
+      prices.push(parseFloat(stock_data.values[j].close).toFixed(5));
     }
 
     intervals.prices.push(prices);
@@ -97,9 +93,7 @@ async function BOLL(stock_data) {
   for (let i = 0; i < averages.length; i++) {
     let d = [];
     for (let k = 0; k < intervals.prices[i].length; k++) {
-      let difference = (intervals.prices[i][k] - averages[i]).toFixed(
-        5
-      );
+      let difference = (intervals.prices[i][k] - averages[i]).toFixed(5);
       let dSquared = (difference * difference).toFixed(5);
       d.push(dSquared);
     }
@@ -119,21 +113,14 @@ async function BOLL(stock_data) {
 
   for (let i = 0; i < deviation.length; i++) {
     topBand.push(
-      (
-        parseFloat(deviation[i]) * 2 +
-        parseFloat(averages[i])
-      ).toFixed(5)
+      (parseFloat(deviation[i]) * 2 + parseFloat(averages[i])).toFixed(5)
     );
     lowBand.push(
-      (
-        parseFloat(averages[i]) -
-        parseFloat(deviation[i]) * 2
-      ).toFixed(5)
+      (parseFloat(averages[i]) - parseFloat(deviation[i]) * 2).toFixed(5)
     );
   }
 
   /* data allocation */
-
 
   const ohlcData = {
     values: [],
@@ -144,8 +131,7 @@ async function BOLL(stock_data) {
   };
 
   for (let i = 0; i < stock_data.values.length - 5; i++) {
-    const { datetime, open, high, low, close } =
-      stock_data.values[i];
+    const { datetime, open, high, low, close } = stock_data.values[i];
     ohlcData.values.push([datetime, open, high, low, close]);
   }
 
@@ -173,12 +159,9 @@ async function BOLL(stock_data) {
   });
 
   const compiledData = [ohlcData, volumeData, smaData, uBandData, lBandData];
-  stock_data.chartData = (compiledData);
+  stock_data.chartData = compiledData;
   console.log(stock_data);
-
-
 }
-
 
 app.use(
   session({
@@ -347,78 +330,33 @@ app.post("/login", async (req, res) => {
         allStocks.push(stock_data.data);
         console.log(allStocks);
 
-        const stock_quote = await axios.get('https://api.twelvedata.com/quote?symbol=AAPL&interval=30min&dp=3&apikey=' + api_key);
+        const stock_quote = await axios.get(
+          "https://api.twelvedata.com/quote?symbol=AAPL&interval=30min&dp=3&apikey=" +
+            api_key
+        );
 
-        const stock_logo = await axios.get('https://api.twelvedata.com/logo?symbol=AAPL&apikey=' + api_key);
+        const stock_logo = await axios.get(
+          "https://api.twelvedata.com/logo?symbol=AAPL&apikey=" + api_key
+        );
         console.log(stock_logo.data.url);
 
-        const logoProcess = await axios.get('http://localhost:3000/bg-remove?rawURL=' + `${stock_logo.data.url}`) // REMOVE BEFORE DEPLOY
+        const logoProcess = await axios.get(
+          "http://localhost:3000/bg-remove?rawURL=" + `${stock_logo.data.url}`
+        ); // REMOVE BEFORE DEPLOY
         console.log(logoProcess.data);
 
-        const realPrice = await axios.get('https://api.twelvedata.com/price?symbol=AAPL&dp=2&apikey=' + api_key);
-
-        /* calculations */
-
-        // let averages = [];
-        // let diff = {
-        //   diffSets: [],
-        // };
-        // let intervals = {
-        //   prices: [],
-        // };
-        // let deviation = []; 
-        // let topBand = [];
-        // let lowBand = [];
+        const realPrice = await axios.get(
+          "https://api.twelvedata.com/price?symbol=AAPL&dp=2&apikey=" + api_key
+        );
 
         try {
-
-          await BOLL(allStocks[0]);
+          await dataExtract(allStocks[0]);
 
           console.log("chart data sent successfuly");
-
         } catch (error) {
           console.log(error);
           res.status(500);
         }
-
-        /* data allocation for config */
-
-/*         const ohlcData = {
-          values: [],
-        };
-
-        const volumeData = {
-          values: [],
-        };
-
-        for (let i = 0; i < stock_data.data.values.length - 5; i++) {
-          const { datetime, open, high, low, close } =
-            stock_data.data.values[i];
-          ohlcData.values.push([datetime, open, high, low, close]);
-        }
-
-        for (let i = 0; i < stock_data.data.values.length - 5; i++) {
-          const { datetime, volume } = stock_data.data.values[i];
-          volumeData.values.push([datetime, volume]);
-        }
-
-        const lBandData = stock_data.data.values.map((value, index) => {
-          const datetime = value.datetime;
-          const lBandValue = lowBand[index];
-          return [datetime, lBandValue];
-        });
-
-        const uBandData = stock_data.data.values.map((value, index) => {
-          const datetime = value.datetime;
-          const uBandValue = topBand[index];
-          return [datetime, uBandValue];
-        });
-
-        const smaData = stock_data.data.values.map((value, index) => {
-          const datetime = value.datetime;
-          const sma = averages[index];
-          return [datetime, sma];
-        }); */
 
         /* chart config */
 
@@ -429,13 +367,15 @@ app.post("/login", async (req, res) => {
             datasets: [
               {
                 yAxisID: "y1",
-                data: allStocks[0].chartData[0].values.map(([d, o, h, l, c]) => ({
-                  x: new Date(d).getTime(),
-                  o,
-                  h,
-                  l,
-                  c,
-                })),
+                data: allStocks[0].chartData[0].values.map(
+                  ([d, o, h, l, c]) => ({
+                    x: new Date(d).getTime(),
+                    o,
+                    h,
+                    l,
+                    c,
+                  })
+                ),
                 color: {
                   up: "rgb(98, 236, 98)",
                   down: "rgb(255,106,106)",
@@ -629,7 +569,6 @@ app.post("/login", async (req, res) => {
         currency_base: currency_base,
         currency_group: currency_group,
       });
-
     }
   } else {
     /* auth fail */
@@ -646,12 +585,11 @@ app.post("/login", async (req, res) => {
   db.close();
 });
 
-app.get('/bg-remove', async (req, res) => {
-
-  async function imageProccess (imageURL) {
+app.get("/bg-remove", async (req, res) => {
+  async function imageProccess(imageURL) {
     try {
       const response = await axios.get(imageURL, {
-        responseType: 'arraybuffer'
+        responseType: "arraybuffer",
       });
 
       let image = await sharp(response.data);
@@ -660,48 +598,44 @@ app.get('/bg-remove', async (req, res) => {
       const hasAlpha = metadata.hasAlpha;
 
       if (!hasAlpha) {
-        image = image.png({alphaQuality: -1, force: true});
-        console.log('fuckyou')
+        image = image.png({ alphaQuality: -1, force: true });
+        console.log("fuckyou");
       }
 
-      const {data, info} = await image
-       .ensureAlpha()
-       .raw()
-       .toBuffer({resolveWithObject: true});
+      const { data, info } = await image
+        .ensureAlpha()
+        .raw()
+        .toBuffer({ resolveWithObject: true });
 
-      for (let i = 0; i < data.length; i +=4) {
+      for (let i = 0; i < data.length; i += 4) {
         if (data[i] === 255 && data[i + 1] === 255 && data[i + 2] === 255) {
           data[i + 3] = 0;
         }
       }
 
-      const proccessedImage = await sharp(data, {raw: info}).png().toBuffer(); 
+      const proccessedImage = await sharp(data, { raw: info }).png().toBuffer();
 
-      const proccessedURL = `data:image/png;base64,${proccessedImage.toString('base64')}`;
+      const proccessedURL = `data:image/png;base64,${proccessedImage.toString(
+        "base64"
+      )}`;
 
       return proccessedURL;
-
     } catch (error) {
-      console.log('error processing image', error);
+      console.log("error processing image", error);
       throw error;
     }
   }
 
   try {
-
     const rawURL = req.query.rawURL;
 
     const logo = await imageProccess(rawURL);
 
-    res.json({logo: logo});
-
+    res.json({ logo: logo });
   } catch (error) {
-
-    console.error('error with request:', error);
+    console.error("error with request:", error);
     res.status(500);
-
   }
-
 });
 
 app.post("/user-setup", async (req, res) => {
