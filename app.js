@@ -10,6 +10,7 @@ import sharp from "sharp";
 const app = express();
 const port = 3000;
 const api_key = "46acf3ff0eac49e385eb6e756b7b7e4e";
+let check = true;
 
 const db = new sqlite3.Database("./data/stalker.db", (err) => {
   if (err) {
@@ -19,7 +20,7 @@ const db = new sqlite3.Database("./data/stalker.db", (err) => {
   }
 });
 
-let check = true;
+/* db interactions */
 
 async function select(query, params) {
   try {
@@ -56,6 +57,126 @@ async function insert(query, params) {
     console.error(err);
     throw err;
   }
+}
+
+/* chart builder */
+
+async function BOLL(stock_data) {
+
+  let averages = [];
+  let diff = {
+    diffSets: [],
+  };
+  let intervals = {
+    prices: [],
+  };
+  let deviation = [];
+  let topBand = [];
+  let lowBand = [];
+
+  /* mean calc + price storing */
+
+  for (let i = 0; i < stock_data.values.length - 5; i++) {
+    let sum = 0;
+    let prices = [];
+
+    for (let j = i; j < i + 5; j++) {
+      sum += parseFloat(stock_data.values[j].close);
+      prices.push(
+        parseFloat(stock_data.values[j].close).toFixed(5)
+      );
+    }
+
+    intervals.prices.push(prices);
+    let avg = (sum / 5).toFixed(5);
+    averages.push(avg);
+  }
+
+  /* diff calc (price - mean) and square */
+
+  for (let i = 0; i < averages.length; i++) {
+    let d = [];
+    for (let k = 0; k < intervals.prices[i].length; k++) {
+      let difference = (intervals.prices[i][k] - averages[i]).toFixed(
+        5
+      );
+      let dSquared = (difference * difference).toFixed(5);
+      d.push(dSquared);
+    }
+    diff.diffSets.push(d);
+  }
+
+  /* variance calc (sum of squares / prices) and std calc (root of variance) */
+
+  for (let i = 0; i < diff.diffSets.length; i++) {
+    let squareSum = 0;
+    for (let j = 0; j < diff.diffSets[i].length; j++) {
+      squareSum += parseFloat(diff.diffSets[i][j]);
+    }
+    let variance = squareSum / 5;
+    deviation.push(Math.sqrt(variance).toFixed(5));
+  }
+
+  for (let i = 0; i < deviation.length; i++) {
+    topBand.push(
+      (
+        parseFloat(deviation[i]) * 2 +
+        parseFloat(averages[i])
+      ).toFixed(5)
+    );
+    lowBand.push(
+      (
+        parseFloat(averages[i]) -
+        parseFloat(deviation[i]) * 2
+      ).toFixed(5)
+    );
+  }
+
+  /* data allocation */
+
+
+  const ohlcData = {
+    values: [],
+  };
+
+  const volumeData = {
+    values: [],
+  };
+
+  for (let i = 0; i < stock_data.values.length - 5; i++) {
+    const { datetime, open, high, low, close } =
+      stock_data.values[i];
+    ohlcData.values.push([datetime, open, high, low, close]);
+  }
+
+  for (let i = 0; i < stock_data.values.length - 5; i++) {
+    const { datetime, volume } = stock_data.values[i];
+    volumeData.values.push([datetime, volume]);
+  }
+
+  const lBandData = stock_data.values.map((value, index) => {
+    const datetime = value.datetime;
+    const lBandValue = lowBand[index];
+    return [datetime, lBandValue];
+  });
+
+  const uBandData = stock_data.values.map((value, index) => {
+    const datetime = value.datetime;
+    const uBandValue = topBand[index];
+    return [datetime, uBandValue];
+  });
+
+  const smaData = stock_data.values.map((value, index) => {
+    const datetime = value.datetime;
+    const sma = averages[index];
+    return [datetime, sma];
+  });
+
+  const compiledData = [ohlcData, volumeData, smaData, uBandData, lBandData];
+  stock_data.chartData = (compiledData);
+  console.log(stock_data);
+
+
 }
 
 
@@ -221,6 +342,11 @@ app.post("/login", async (req, res) => {
             api_key
         );
 
+        const allStocks = [];
+
+        allStocks.push(stock_data.data);
+        console.log(allStocks);
+
         const stock_quote = await axios.get('https://api.twelvedata.com/quote?symbol=AAPL&interval=30min&dp=3&apikey=' + api_key);
 
         const stock_logo = await axios.get('https://api.twelvedata.com/logo?symbol=AAPL&apikey=' + api_key);
@@ -233,82 +359,23 @@ app.post("/login", async (req, res) => {
 
         /* calculations */
 
-        let averages = [];
-        let diff = {
-          diffSets: [],
-        };
-        let intervals = {
-          prices: [],
-        };
-        let deviation = [];
-        let topBand = [];
-        let lowBand = [];
+        // let averages = [];
+        // let diff = {
+        //   diffSets: [],
+        // };
+        // let intervals = {
+        //   prices: [],
+        // };
+        // let deviation = []; 
+        // let topBand = [];
+        // let lowBand = [];
 
         try {
-          async function BOLL() {
-            /* mean calc + price storing */
 
-            for (let i = 0; i < stock_data.data.values.length - 5; i++) {
-              let sum = 0;
-              let prices = [];
-
-              for (let j = i; j < i + 5; j++) {
-                sum += parseFloat(stock_data.data.values[j].close);
-                prices.push(
-                  parseFloat(stock_data.data.values[j].close).toFixed(5)
-                );
-              }
-
-              intervals.prices.push(prices);
-              let avg = (sum / 5).toFixed(5);
-              averages.push(avg);
-            }
-
-            /* diff calc (price - mean) and square */
-
-            for (let i = 0; i < averages.length; i++) {
-              let d = [];
-              for (let k = 0; k < intervals.prices[i].length; k++) {
-                let difference = (intervals.prices[i][k] - averages[i]).toFixed(
-                  5
-                );
-                let dSquared = (difference * difference).toFixed(5);
-                d.push(dSquared);
-              }
-              diff.diffSets.push(d);
-            }
-
-            /* variance calc (sum of squares / prices) and std calc (root of variance) */
-
-            for (let i = 0; i < diff.diffSets.length; i++) {
-              let squareSum = 0;
-              for (let j = 0; j < diff.diffSets[i].length; j++) {
-                squareSum += parseFloat(diff.diffSets[i][j]);
-              }
-              let variance = squareSum / 5;
-              deviation.push(Math.sqrt(variance).toFixed(5));
-            }
-
-            for (let i = 0; i < deviation.length; i++) {
-              topBand.push(
-                (
-                  parseFloat(deviation[i]) * 2 +
-                  parseFloat(averages[i])
-                ).toFixed(5)
-              );
-              lowBand.push(
-                (
-                  parseFloat(averages[i]) -
-                  parseFloat(deviation[i]) * 2
-                ).toFixed(5)
-              );
-            }
-          }
-
-          await BOLL();
+          await BOLL(allStocks[0]);
 
           console.log("chart data sent successfuly");
-          console.log(topBand.length);
+
         } catch (error) {
           console.log(error);
           res.status(500);
@@ -316,7 +383,7 @@ app.post("/login", async (req, res) => {
 
         /* data allocation for config */
 
-        const ohlcData = {
+/*         const ohlcData = {
           values: [],
         };
 
@@ -351,7 +418,7 @@ app.post("/login", async (req, res) => {
           const datetime = value.datetime;
           const sma = averages[index];
           return [datetime, sma];
-        });
+        }); */
 
         /* chart config */
 
@@ -362,7 +429,7 @@ app.post("/login", async (req, res) => {
             datasets: [
               {
                 yAxisID: "y1",
-                data: ohlcData.values.map(([d, o, h, l, c]) => ({
+                data: allStocks[0].chartData[0].values.map(([d, o, h, l, c]) => ({
                   x: new Date(d).getTime(),
                   o,
                   h,
@@ -380,7 +447,7 @@ app.post("/login", async (req, res) => {
                 yAxisID: "y2",
                 backgroundColor: "pink",
                 label: "Volume",
-                data: volumeData.values.map(([d, y]) => ({
+                data: allStocks[0].chartData[1].values.map(([d, y]) => ({
                   x: new Date(d).getTime(),
                   y,
                 })),
@@ -393,7 +460,7 @@ app.post("/login", async (req, res) => {
                 borderWidth: 2,
                 pointRadius: 0,
                 label: "SMA",
-                data: smaData.map(([d, y]) => ({
+                data: allStocks[0].chartData[2].map(([d, y]) => ({
                   x: new Date(d).getTime(),
                   y,
                 })),
@@ -406,7 +473,7 @@ app.post("/login", async (req, res) => {
                 borderWidth: 2,
                 pointRadius: 0,
                 label: "Upper Band",
-                data: uBandData.map(([d, y]) => ({
+                data: allStocks[0].chartData[3].map(([d, y]) => ({
                   x: new Date(d).getTime(),
                   y,
                 })),
@@ -419,7 +486,7 @@ app.post("/login", async (req, res) => {
                 borderWidth: 2,
                 pointRadius: 0,
                 label: "Lower Band",
-                data: lBandData.map(([d, y]) => ({
+                data: allStocks[0].chartData[4].map(([d, y]) => ({
                   x: new Date(d).getTime(),
                   y,
                 })),
