@@ -350,10 +350,6 @@ app.post("/login", async (req, res) => {
 
         try {
           await dataExtract(allStocks[0]);
-          await tickerCalc(allStocks);
-
-          console.log(allStocks[0]);
-
           console.log("chart data sent successfuly");
         } catch (error) {
           console.log(error);
@@ -376,6 +372,7 @@ app.post("/login", async (req, res) => {
                     h,
                     l,
                     c,
+                    tooltip: `Open: ${o}, High: ${h}, Low: ${l}, Close: ${c}`
                   })
                 ),
                 color: {
@@ -496,6 +493,11 @@ app.post("/login", async (req, res) => {
               },
             },
           },
+          plugins: {
+            tooltip: {
+              enabled: false,
+            }
+          }
         });
 
         await chart
