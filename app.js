@@ -1,7 +1,7 @@
 import express, { response } from "express";
 import session from "express-session";
 import sqlite3 from "sqlite3";
-import axios from "axios";
+import axios, { all } from "axios";
 import bodyParser from "body-parser";
 import QuickChart from "quickchart-js";
 import sharp from "sharp";
@@ -161,6 +161,27 @@ async function dataExtract(stock_data) {
   const compiledData = [ohlcData, volumeData, smaData, uBandData, lBandData];
   stock_data.chartData = compiledData;
   console.log(stock_data);
+}
+
+function tickerCalc (allStocks) {
+
+ allStocks.forEach((stock) => {
+
+  const minY = Math.min(...stock.chartData[0].values.map(([_, y]) => y));
+  const maxY = Math.max(...stock.chartData[0].values.map(([_, y]) => y));
+
+  const minTick = minY - Math.sqrt(minY);
+  const maxTick = maxY + Math.sqrt(maxY);
+  const step = (maxTick - minTick) * .01;
+
+  stock.ticks = {
+    min: parseFloat(minY.toFixed(3)),
+    max: parseFloat(maxY.toFixed(3)),
+    step: parseFloat(step.toFixed(3))
+  };
+
+ }); 
+  
 }
 
 app.use(
@@ -328,7 +349,6 @@ app.post("/login", async (req, res) => {
         const allStocks = [];
 
         allStocks.push(stock_data.data);
-        console.log(allStocks);
 
         const stock_quote = await axios.get(
           "https://api.twelvedata.com/quote?symbol=AAPL&interval=30min&dp=3&apikey=" +
@@ -338,19 +358,22 @@ app.post("/login", async (req, res) => {
         const stock_logo = await axios.get(
           "https://api.twelvedata.com/logo?symbol=AAPL&apikey=" + api_key
         );
-        console.log(stock_logo.data.url);
 
         const logoProcess = await axios.get(
-          "http://localhost:3000/bg-remove?rawURL=" + `${stock_logo.data.url}`
-        ); // REMOVE BEFORE DEPLOY
-        console.log(logoProcess.data);
+          "http://localhost:3000/bg-remove?rawURL=" + `${stock_logo.data.url}` // REMOVE BEFORE DEPLOY
+        ); 
 
         const realPrice = await axios.get(
           "https://api.twelvedata.com/price?symbol=AAPL&dp=2&apikey=" + api_key
         );
 
+        /* data allocation for chart  */
+
         try {
           await dataExtract(allStocks[0]);
+          await tickerCalc(allStocks);
+
+          console.log(allStocks[0]);
 
           console.log("chart data sent successfuly");
         } catch (error) {
@@ -361,7 +384,7 @@ app.post("/login", async (req, res) => {
         /* chart config */
 
         const chart = new QuickChart();
-        await chart.setConfig({
+  await chart.setConfig({
           type: "ohlc",
           data: {
             datasets: [
@@ -460,6 +483,7 @@ app.post("/login", async (req, res) => {
                 stack: "stockChart",
                 stackWeight: 10000000,
                 weight: 2,
+                grace: '50%',
                 grid: {
                   display: false,
                 },
@@ -468,6 +492,7 @@ app.post("/login", async (req, res) => {
                   font: {
                     size: 10,
                   },
+                  padding: 0,  
                 },
               },
               y2: {
