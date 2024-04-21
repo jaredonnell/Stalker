@@ -163,27 +163,6 @@ async function dataExtract(stock_data) {
   console.log(stock_data);
 }
 
-function tickerCalc (allStocks) {
-
- allStocks.forEach((stock) => {
-
-  const minY = Math.min(...stock.chartData[0].values.map(([_, y]) => y));
-  const maxY = Math.max(...stock.chartData[0].values.map(([_, y]) => y));
-
-  const minTick = minY - Math.sqrt(minY);
-  const maxTick = maxY + Math.sqrt(maxY);
-  const step = (maxTick - minTick) * .01;
-
-  stock.ticks = {
-    min: parseFloat(minY.toFixed(3)),
-    max: parseFloat(maxY.toFixed(3)),
-    step: parseFloat(step.toFixed(3))
-  };
-
- }); 
-  
-}
-
 app.use(
   session({
     secret: "aniamtedCrutons486",
