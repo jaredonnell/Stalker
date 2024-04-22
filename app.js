@@ -4,6 +4,7 @@ import sqlite3 from "sqlite3";
 import axios, { all } from "axios";
 import bodyParser from "body-parser";
 import QuickChart from "quickchart-js";
+import { Chart, Tooltip } from "chart.js/auto";
 import sharp from "sharp";
 
 const app = express();
@@ -56,6 +57,46 @@ async function insert(query, params) {
     console.error(err);
     throw err;
   }
+}
+
+async function slowSelect(batchSize, userPref) {
+
+  let offset = 0;
+  let dataRows = [];
+
+  await new Promise((resolve, reject) => {
+    function fetchNextBatch() {
+      db.all(
+        `SELECT * FROM ${userPref} LIMIT ${batchSize} OFFSET ${offset}`,
+        (err, rows) => {
+          if (err) {
+            console.error("Error fetching data:", err);
+            return;
+          }
+
+          processBatch(rows);
+
+          if (rows.length === batchSize) {
+            offset += batchSize;
+            fetchNextBatch();
+          } else {
+            resolve(dataRows);
+          }
+        }
+      );
+    }
+
+    function processBatch(rows) {
+      rows.forEach((row) => {
+        dataRows.push(row);
+      });
+    }
+
+    fetchNextBatch();
+  });
+
+  return dataRows;
+
 }
 
 /* chart builder */
@@ -163,6 +204,8 @@ async function dataExtract(stock_data) {
   console.log(stock_data);
 }
 
+/* middleware */
+
 app.use(
   session({
     secret: "aniamtedCrutons486",
@@ -174,6 +217,8 @@ app.use(
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static("public"));
+
+/* lander */
 
 app.get("/", async (req, res) => {
   res.render("index.ejs", { name_taken: "" });
@@ -229,10 +274,9 @@ app.post("/login", async (req, res) => {
 
   console.log(user);
 
-  /* directs to user page */
+  if (user[0].password == req.body.password) {   /* directs to user page */
 
-  if (user[0].password == req.body.password) {
-    /* check for user profile information */
+  /* check for user profile information */
 
     const user_check = await select("SELECT * FROM profile");
 
@@ -264,10 +308,12 @@ app.post("/login", async (req, res) => {
       );
 
       if (profile[0].stock_pref !== null) {
-        const preferred_stocks = await select(
-          `SELECT * FROM ${profile[0].stock_pref.toLowerCase()}`
+        const preferred_stocks = await slowSelect(
+         25000, 
+         profile[0].stock_pref.toLowerCase() 
         );
 
+        console.log(preferred_stocks);
         /* filter options config */
 
         let countries = [];
@@ -340,7 +386,7 @@ app.post("/login", async (req, res) => {
 
         const logoProcess = await axios.get(
           "http://localhost:3000/bg-remove?rawURL=" + `${stock_logo.data.url}` // REMOVE BEFORE DEPLOY
-        ); 
+        );
 
         const realPrice = await axios.get(
           "https://api.twelvedata.com/price?symbol=AAPL&dp=2&apikey=" + api_key
@@ -358,8 +404,8 @@ app.post("/login", async (req, res) => {
 
         /* chart config */
 
-        const chart = new QuickChart();
-  await chart.setConfig({
+        // const chart = new QuickChart();
+        await new Chart(ctx, {
           type: "ohlc",
           data: {
             datasets: [
@@ -372,7 +418,6 @@ app.post("/login", async (req, res) => {
                     h,
                     l,
                     c,
-                    tooltip: `Open: ${o}, High: ${h}, Low: ${l}, Close: ${c}`
                   })
                 ),
                 color: {
@@ -459,7 +504,7 @@ app.post("/login", async (req, res) => {
                 stack: "stockChart",
                 stackWeight: 10000000,
                 weight: 2,
-                grace: '50%',
+                grace: "50%",
                 grid: {
                   display: false,
                 },
@@ -468,7 +513,7 @@ app.post("/login", async (req, res) => {
                   font: {
                     size: 10,
                   },
-                  padding: 0,  
+                  padding: 0,
                 },
               },
               y2: {
@@ -496,16 +541,16 @@ app.post("/login", async (req, res) => {
           plugins: {
             tooltip: {
               enabled: false,
-            }
-          }
+            },
+          },
         });
 
-        await chart
-          .setVersion("3.4.0")
-          .setBackgroundColor("transparent")
-          .setHeight(300)
-          .setWidth(600);
-        const url = await chart.getUrl();
+        // await chart
+        // .setVersion("3.4.0")
+        // .setBackgroundColor("transparent")
+        // .setHeight(300)
+        // .setWidth(600);
+        // const url = await chart.getUrl();
 
         res.render("home.ejs", {
           profile: profile,
@@ -643,6 +688,24 @@ app.get("/bg-remove", async (req, res) => {
     res.status(500);
   }
 });
+
+app.get('/stockGen', async(req, res) => {
+
+  const user = await select("SELECT * FROM profile WHERE username = ($1)", [req.session.username]);
+  const options = await select(`SELECT symbol FROM ${user[0].stock_pref.toLowerCase()}`)
+
+  let stocks = [];
+
+  for (let i = 0; i < 5; i++) {
+    stocks.push(
+      options[Math.floor(Math.random() * options.length)].symbol
+    );
+    i++
+  }
+
+  res.json({stocks});
+
+})
 
 app.post("/user-setup", async (req, res) => {
   const db = new sqlite3.Database("./data/stalker.db", (err) => {
