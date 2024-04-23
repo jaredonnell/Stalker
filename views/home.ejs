@@ -279,7 +279,7 @@
 
         <% } %>
 
-        <div class="option-title jost-head">
+        <div class="option-title jost-head" data-currentStocks="<%= currentStocks %>" data-stockData="<%= allStocks %>" >
           <h1><%= profile[0].stock_pref %></h1>
         </div>
 
@@ -304,7 +304,7 @@
             </div>
             <div class="volume">
               <h3 class="jost">Volume:</h3>
-              <h3 class="jost"><%= stock_data.values[stock_data.values.length - 1].volume %></h3>
+              <h3 class="jost"><%= allStocks[0].values[stock_data.values.length - 1].volume %></h3>
             </div>
             <% if (stock_quote.percent_change < 0) { %>
               <div class="indicator" style="background-color: rgb(255,106,106);"></div> 
@@ -441,7 +441,7 @@
 
           greet.style.height = 0;
         }
-      }, 3000);
+      }, 3500);
 
       setTimeout(() => {
         let main = document.querySelector(".wrapper");

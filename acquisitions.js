@@ -1,7 +1,17 @@
-import Chart from 'chart.js/auto';
-import axios from 'axios';
+import Chart from "chart.js/auto";
+import axios from "axios";
 
-async function dataExtract(stock_data) {
+/* NOTE: perform first 2 card builds server-side
+ for immediate availability, perform subsequent cards
+ from client side for dynamic rendering */
+ 
+ /* function will be needed to build next 2 cards,
+ this includes data collection and chart configuration and
+ will be seperate from the configuration used for the
+ 2 intial cards */
+
+
+async function dataExtract() {
   let averages = [];
   let diff = {
     diffSets: [],
@@ -103,8 +113,3 @@ async function dataExtract(stock_data) {
   stock_data.chartData = compiledData;
   console.log(stock_data);
 }
-
-const currentOptions = fetch ('./stockGen').then(response => {
-    return response;
-});
-

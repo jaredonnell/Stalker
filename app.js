@@ -357,7 +357,7 @@ app.post("/login", async (req, res) => {
 
         /* API calls */
 
-        let stocks = [];
+        let currentStocks = [];
         for (let i = 0; i < 5; i++) {
           stocks.push(
             preferred_stocks[i].symbol[
@@ -404,8 +404,8 @@ app.post("/login", async (req, res) => {
 
         /* chart config */
 
-        // const chart = new QuickChart();
-        await new Chart(ctx, {
+        const chart = new QuickChart();
+        await chart.setConfig({
           type: "ohlc",
           data: {
             datasets: [
@@ -545,23 +545,23 @@ app.post("/login", async (req, res) => {
           },
         });
 
-        // await chart
-        // .setVersion("3.4.0")
-        // .setBackgroundColor("transparent")
-        // .setHeight(300)
-        // .setWidth(600);
-        // const url = await chart.getUrl();
+        await chart
+        .setVersion("3.4.0")
+        .setBackgroundColor("transparent")
+        .setHeight(300)
+        .setWidth(600);
+        const url = await chart.getUrl();
 
         res.render("home.ejs", {
           profile: profile,
           setup: startQuestion,
           preferred_stocks: preferred_stocks,
-          stock_data: stock_data.data,
+          allStocks: allStocks,
           stock_quote: stock_quote.data,
           logoURL: logoProcess.data.logo,
           realPrice: realPrice.data.price,
           url: url,
-          stocks: stocks,
+          currentStocks: currentStocks,
           countries: countries,
           currencies: currencies,
           exchanges: exchanges,
@@ -705,7 +705,7 @@ app.get('/stockGen', async(req, res) => {
 
   res.json({stocks});
 
-})
+});
 
 app.post("/user-setup", async (req, res) => {
   const db = new sqlite3.Database("./data/stalker.db", (err) => {
