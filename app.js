@@ -60,7 +60,6 @@ async function insert(query, params) {
 }
 
 async function slowSelect(batchSize, userPref) {
-
   let offset = 0;
   let dataRows = [];
 
@@ -96,7 +95,6 @@ async function slowSelect(batchSize, userPref) {
   });
 
   return dataRows;
-
 }
 
 /* chart builder */
@@ -274,9 +272,10 @@ app.post("/login", async (req, res) => {
 
   console.log(user);
 
-  if (user[0].password == req.body.password) {   /* directs to user page */
+  if (user[0].password == req.body.password) {
+    /* directs to user page */
 
-  /* check for user profile information */
+    /* check for user profile information */
 
     const user_check = await select("SELECT * FROM profile");
 
@@ -309,8 +308,8 @@ app.post("/login", async (req, res) => {
 
       if (profile[0].stock_pref !== null) {
         const preferred_stocks = await slowSelect(
-         25000, 
-         profile[0].stock_pref.toLowerCase() 
+          25000,
+          profile[0].stock_pref.toLowerCase()
         );
 
         console.log(preferred_stocks);
@@ -358,39 +357,52 @@ app.post("/login", async (req, res) => {
         /* API calls */
 
         let currentStocks = [];
-        for (let i = 0; i < 5; i++) {
-          stocks.push(
+        for (let i = 0; i < 3; i++) {
+          currentStocks.push(
             preferred_stocks[i].symbol[
               Math.floor(Math.random() * preferred_stocks.length)
             ]
           );
         }
 
-        const stock_data = await axios.get(
-          "https://api.twelvedata.com/time_series?symbol=AAPL&interval=1min&outputsize=35&apikey=" +
-            api_key
-        );
-
         const allStocks = [];
+        const allQuotes = [];
+        const logos = [];
+        const prices = [];
 
-        allStocks.push(stock_data.data);
+        for (let i = 0; i < currentStocks.length; i++) {
+          const stock_data = await axios.get(
+            `https://api.twelvedata.com/time_series?symbol=${currentStocks[i]}&interval=1min&outputsize=35&apikey=` +
+              api_key
+          );
 
-        const stock_quote = await axios.get(
-          "https://api.twelvedata.com/quote?symbol=AAPL&interval=30min&dp=3&apikey=" +
-            api_key
-        );
+          allStocks.push(stock_data.data);
 
-        const stock_logo = await axios.get(
-          "https://api.twelvedata.com/logo?symbol=AAPL&apikey=" + api_key
-        );
+          const stock_quote = await axios.get(
+            `https://api.twelvedata.com/quote?symbol=${currentStocks[i]}&interval=30min&dp=3&apikey=` +
+              api_key
+          );
 
-        const logoProcess = await axios.get(
-          "http://localhost:3000/bg-remove?rawURL=" + `${stock_logo.data.url}` // REMOVE BEFORE DEPLOY
-        );
+          allQuotes.push(stock_quote.data);
 
-        const realPrice = await axios.get(
-          "https://api.twelvedata.com/price?symbol=AAPL&dp=2&apikey=" + api_key
-        );
+          const stock_logo = await axios.get(
+            `https://api.twelvedata.com/logo?symbol=${currentStocks[i]}&apikey=` + api_key
+          );
+
+          const logoProcess = await axios.get(
+            "http://localhost:3000/bg-remove?rawURL=" + `${stock_logo.data.url}` // REMOVE BEFORE DEPLOY
+          );
+
+          logos.push(logoProcess.data.logo);
+
+          const realPrice = await axios.get(
+            `https://api.twelvedata.com/price?symbol=${currentStocks[i]}&dp=2&apikey=` +
+              api_key
+          );
+
+          prices.push(realPrice.data);
+
+        }
 
         /* data allocation for chart  */
 
@@ -546,10 +558,10 @@ app.post("/login", async (req, res) => {
         });
 
         await chart
-        .setVersion("3.4.0")
-        .setBackgroundColor("transparent")
-        .setHeight(300)
-        .setWidth(600);
+          .setVersion("3.4.0")
+          .setBackgroundColor("transparent")
+          .setHeight(300)
+          .setWidth(600);
         const url = await chart.getUrl();
 
         res.render("home.ejs", {
@@ -557,9 +569,9 @@ app.post("/login", async (req, res) => {
           setup: startQuestion,
           preferred_stocks: preferred_stocks,
           allStocks: allStocks,
-          stock_quote: stock_quote.data,
-          logoURL: logoProcess.data.logo,
-          realPrice: realPrice.data.price,
+          allQuotes: allQuotes,
+          logos: logos,
+          prices: prices,
           url: url,
           currentStocks: currentStocks,
           countries: countries,
@@ -689,22 +701,22 @@ app.get("/bg-remove", async (req, res) => {
   }
 });
 
-app.get('/stockGen', async(req, res) => {
-
-  const user = await select("SELECT * FROM profile WHERE username = ($1)", [req.session.username]);
-  const options = await select(`SELECT symbol FROM ${user[0].stock_pref.toLowerCase()}`)
+app.get("/stockGen", async (req, res) => {
+  const user = await select("SELECT * FROM profile WHERE username = ($1)", [
+    req.session.username,
+  ]);
+  const options = await select(
+    `SELECT symbol FROM ${user[0].stock_pref.toLowerCase()}`
+  );
 
   let stocks = [];
 
   for (let i = 0; i < 5; i++) {
-    stocks.push(
-      options[Math.floor(Math.random() * options.length)].symbol
-    );
-    i++
+    stocks.push(options[Math.floor(Math.random() * options.length)].symbol);
+    i++;
   }
 
-  res.json({stocks});
-
+  res.json({ stocks });
 });
 
 app.post("/user-setup", async (req, res) => {

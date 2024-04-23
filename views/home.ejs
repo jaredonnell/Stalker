@@ -286,27 +286,28 @@
         <!--cards-->
 
       <div class="card-wrap hide">
+        <% for (let i = 0; i < currentStocks.length; i++) { %>
         <div class="favorite">
           <p class="jost">+ Favorite</p>
         </div>
         <div class="card">
           <div class="main">
             <div class="logo">
-              <img class="logoImage" src="<%= logoURL %>" alt="">
+              <img class="logoImage" src="<%= logos[i] %>" alt="">
             </div>
             <div class="card-title">
-              <h3 class="jost-head"><%= stock_quote.symbol %></h3>
-              <p class="jost"><%= stock_quote.name %></p>
+              <h3 class="jost-head"><%= allQuotes[i].symbol %></h3>
+              <p class="jost"><%= allQuotes[i].name %></p>
             </div>
             <div class="change">
-              <h3 class="jost"><%= stock_quote.percent_change %>%</h3>
-              <h3 class="jost"><%= realPrice %></h3>
+              <h3 class="jost"><%= allQuotes[i].percent_change %>%</h3>
+              <h3 class="jost"><%= prices[i] %></h3>
             </div>
             <div class="volume">
               <h3 class="jost">Volume:</h3>
-              <h3 class="jost"><%= allStocks[0].values[stock_data.values.length - 1].volume %></h3>
+              <h3 class="jost"><%= allStocks[i].values[stock_data.values.length - 1].volume %></h3>
             </div>
-            <% if (stock_quote.percent_change < 0) { %>
+            <% if (allQuotes[i].percent_change < 0) { %>
               <div class="indicator" style="background-color: rgb(255,106,106);"></div> 
            <% } else { %>
             <div class="indicator"></div>
@@ -335,7 +336,9 @@
           </div>
         </div>
       </div>
-        
+            
+        <% } %>
+                  
       </div>
 
       
