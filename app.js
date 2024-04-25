@@ -425,7 +425,7 @@ app.post("/login", async (req, res) => {
                 yAxisID: "y1",
                 data: allStocks[0].chartData[0].values.map(
                   ([d, o, h, l, c]) => ({
-                    x: new Date(d).getTime(),
+                    t: new Date(d).getTime(),
                     o,
                     h,
                     l,

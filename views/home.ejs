@@ -279,7 +279,7 @@
 
         <% } %>
 
-        <div class="option-title jost-head" data-currentStocks="<%= currentStocks %>" data-stockData="<%= allStocks %>" >
+        <div class="option-title jost-head" data-currentStocks="<%= currentStocks %>" data-allStocks="<%= allStocks %>" >
           <h1><%= profile[0].stock_pref %></h1>
         </div>
 
@@ -305,7 +305,7 @@
             </div>
             <div class="volume">
               <h3 class="jost">Volume:</h3>
-              <h3 class="jost"><%= allStocks[i].values[stock_data.values.length - 1].volume %></h3>
+              <h3 class="jost"><%= allStocks[i].values[allStocks[i].values.length - 1].volume %></h3>
             </div>
             <% if (allQuotes[i].percent_change < 0) { %>
               <div class="indicator" style="background-color: rgb(255,106,106);"></div> 
@@ -314,7 +314,7 @@
             <% } %>
           </div>
           <div class="graph">
-            <img class="chart" src="<%= url %>" alt="">
+            <canvas id="chart"></canvas>
             <div class="legend">
               <div class="sma">
                 <div></div>
