@@ -200,7 +200,6 @@ async function dataExtract(stock_data) {
 
   const compiledData = [ohlcData, volumeData, smaData, uBandData, lBandData];
   stock_data.chartData = compiledData;
-  console.log(stock_data);
 }
 
 /* middleware */
@@ -375,7 +374,7 @@ app.post("/login", async (req, res) => {
         const prices = [];
 
         for (let i = 0; i < currentStocks.length; i++) {
-          const stock_data = await axios.get(
+          let stock_data = await axios.get(
             `https://api.twelvedata.com/time_series?symbol=${currentStocks[i]}&interval=1min&outputsize=35&apikey=` +
               api_key
           );
@@ -385,7 +384,7 @@ app.post("/login", async (req, res) => {
           	allStocks.push(stock_data.data);
           }
 
-          const stock_quote = await axios.get(
+          let stock_quote = await axios.get(
             `https://api.twelvedata.com/quote?symbol=${currentStocks[i]}&interval=30min&dp=3&apikey=` + api_key
           );
 
@@ -428,10 +427,39 @@ app.post("/login", async (req, res) => {
 
         /* data allocation for chart  */
 	console.log(allStocks[0]);
-
+	console.log(allStocks.length);
+	
         try {
+
+	if (allStocks.length == 0) {
+
+	  console.log('right fuckin here');
+
+      	  res.render("home.ejs", {
+           profile: profile,
+           setup: startQuestion,
+           preferred_stocks: preferred_stocks,
+           allStocks: allStocks,
+           allQuotes: allQuotes,
+           logos: logos,
+           prices: prices,
+           url: "",
+           currentStocks: currentStocks,
+           countries: countries,
+           currencies: currencies,
+           exchanges: exchanges,
+       	   currency_quote: currency_quote,
+       	   currency_base: currency_base,
+       	   currency_group: currency_group,
+	  });
+
+	} else {
+	 
           await dataExtract(allStocks[0]);
           console.log("chart data sent successfuly");
+
+	}
+
         } catch (error) {
           console.log('data consolidation:', error);
           res.status(500);
