@@ -110,6 +110,7 @@ async function dataExtract(stock_data) {
   let deviation = [];
   let topBand = [];
   let lowBand = [];
+  console.log(stock_data);
 
   /* mean calc + price storing */
 
@@ -312,7 +313,7 @@ app.post("/login", async (req, res) => {
           profile[0].stock_pref.toLowerCase()
         );
 
-        console.log(preferred_stocks);
+//        console.log(preferred_stocks);
         /* filter options config */
 
         let countries = [];
@@ -359,11 +360,14 @@ app.post("/login", async (req, res) => {
         let currentStocks = [];
         for (let i = 0; i < 3; i++) {
           currentStocks.push(
-            preferred_stocks[i].symbol[
+            preferred_stocks[
               Math.floor(Math.random() * preferred_stocks.length)
-            ]
+            ].symbol
           );
+	  i++; 
         }
+	
+	console.log(currentStocks);
 
         const allStocks = [];
         const allQuotes = [];
@@ -375,25 +379,43 @@ app.post("/login", async (req, res) => {
             `https://api.twelvedata.com/time_series?symbol=${currentStocks[i]}&interval=1min&outputsize=35&apikey=` +
               api_key
           );
+//	  console.log(stock_data);
 
-          allStocks.push(stock_data.data);
+	  if (stock_data.data.status !== "error") {
+          	allStocks.push(stock_data.data);
+          }
 
           const stock_quote = await axios.get(
-            `https://api.twelvedata.com/quote?symbol=${currentStocks[i]}&interval=30min&dp=3&apikey=` +
-              api_key
+            `https://api.twelvedata.com/quote?symbol=${currentStocks[i]}&interval=30min&dp=3&apikey=` + api_key
           );
 
           allQuotes.push(stock_quote.data);
 
-          const stock_logo = await axios.get(
+          let stock_logo = await axios.get(
             `https://api.twelvedata.com/logo?symbol=${currentStocks[i]}&apikey=` + api_key
-          );
+//	    (res, err) => {
+//		if (err) {
+//			stock_logo = null;
+//			res.json(stock_logo.data);
+//		} 
+	    );
+	  console.log(stock_logo.data.url);
+	  console.log(stock_logo.data.status);
 
-          const logoProcess = await axios.get(
-            "http://localhost:3000/bg-remove?rawURL=" + `${stock_logo.data.url}` // REMOVE BEFORE DEPLOY
-          );
+	  let logoProcess = "null";
 
-          logos.push(logoProcess.data.logo);
+	  if (stock_logo.data.status !== 'error') {
+          
+		  const response = await axios.get(
+	            	`http://localhost:3000/bg-remove?rawURL=${stock_logo.data.url}` // REMOVE BEFORE DEPLOY
+      	          );
+		  logoProcess = response.data.logo;
+//		  console.log(logoProcess)
+
+	  }
+// 	  console.log(logoProcess);
+
+          logos.push(logoProcess);
 
           const realPrice = await axios.get(
             `https://api.twelvedata.com/price?symbol=${currentStocks[i]}&dp=2&apikey=` +
@@ -405,12 +427,13 @@ app.post("/login", async (req, res) => {
         }
 
         /* data allocation for chart  */
+	console.log(allStocks[0]);
 
         try {
           await dataExtract(allStocks[0]);
           console.log("chart data sent successfuly");
         } catch (error) {
-          console.log(error);
+          console.log('data consolidation:', error);
           res.status(500);
         }
 
