@@ -110,7 +110,7 @@ async function dataExtract(stock_data) {
   let deviation = [];
   let topBand = [];
   let lowBand = [];
-  console.log(stock_data);
+ // console.log(stock_data);
 
   /* mean calc + price storing */
 
@@ -312,7 +312,7 @@ app.post("/login", async (req, res) => {
           profile[0].stock_pref.toLowerCase()
         );
 
-//        console.log(preferred_stocks);
+        //        console.log(preferred_stocks);
         /* filter options config */
 
         let countries = [];
@@ -363,10 +363,10 @@ app.post("/login", async (req, res) => {
               Math.floor(Math.random() * preferred_stocks.length)
             ].symbol
           );
-	  i++; 
+          i++;
         }
-	
-	console.log(currentStocks);
+
+        console.log(currentStocks);
 
         const allStocks = [];
         const allQuotes = [];
@@ -378,41 +378,41 @@ app.post("/login", async (req, res) => {
             `https://api.twelvedata.com/time_series?symbol=${currentStocks[i]}&interval=1min&outputsize=35&apikey=` +
               api_key
           );
-//	  console.log(stock_data);
+          console.log(stock_data.data.status);
 
-	  if (stock_data.data.status !== "error") {
-          	allStocks.push(stock_data.data);
+          if (stock_data.data.status === "ok") {
+            allStocks.push(stock_data.data);
           }
 
           let stock_quote = await axios.get(
-            `https://api.twelvedata.com/quote?symbol=${currentStocks[i]}&interval=30min&dp=3&apikey=` + api_key
+            `https://api.twelvedata.com/quote?symbol=${currentStocks[i]}&interval=30min&dp=3&apikey=` +
+              api_key
           );
 
           allQuotes.push(stock_quote.data);
 
           let stock_logo = await axios.get(
-            `https://api.twelvedata.com/logo?symbol=${currentStocks[i]}&apikey=` + api_key
-//	    (res, err) => {
-//		if (err) {
-//			stock_logo = null;
-//			res.json(stock_logo.data);
-//		} 
-	    );
-	  console.log(stock_logo.data.url);
-	  console.log(stock_logo.data.status);
+            `https://api.twelvedata.com/logo?symbol=${currentStocks[i]}&apikey=` +
+              api_key
+            //	    (res, err) => {
+            //		if (err) {
+            //			stock_logo = null;
+            //			res.json(stock_logo.data);
+            //		}
+          );
+          console.log(stock_logo.data.url);
+          console.log(stock_logo.data.status);
 
-	  let logoProcess = "null";
+          let logoProcess = "null";
 
-	  if (stock_logo.data.status !== 'error') {
-          
-		  const response = await axios.get(
-	            	`http://localhost:3000/bg-remove?rawURL=${stock_logo.data.url}` // REMOVE BEFORE DEPLOY
-      	          );
-		  logoProcess = response.data.logo;
-//		  console.log(logoProcess)
-
-	  }
-// 	  console.log(logoProcess);
+          if (stock_logo.data.status !== "error" && stock_logo.data.url !== "") {
+            const response = await axios.get(
+              `http://localhost:3000/bg-remove?rawURL=${stock_logo.data.url}` // REMOVE BEFORE DEPLOY
+            );
+            logoProcess = response.data.logo;
+            console.log(logoProcess);
+          }
+          console.log(logoProcess);
 
           logos.push(logoProcess);
 
@@ -422,47 +422,36 @@ app.post("/login", async (req, res) => {
           );
 
           prices.push(realPrice.data);
-
         }
 
         /* data allocation for chart  */
-	console.log(allStocks[0]);
-	console.log(allStocks.length);
-	
+
+        console.log(allStocks[0]);
+        console.log(allStocks.length);
+
         try {
-
-	if (allStocks.length == 0) {
-
-	  console.log('right fuckin here');
-
-      	  res.render("home.ejs", {
-           profile: profile,
-           setup: startQuestion,
-           preferred_stocks: preferred_stocks,
-           allStocks: allStocks,
-           allQuotes: allQuotes,
-           logos: logos,
-           prices: prices,
-           url: "",
-           currentStocks: currentStocks,
-           countries: countries,
-           currencies: currencies,
-           exchanges: exchanges,
-       	   currency_quote: currency_quote,
-       	   currency_base: currency_base,
-       	   currency_group: currency_group,
-	  });
-
-	} else {
-	 
           await dataExtract(allStocks[0]);
           console.log("chart data sent successfuly");
-
-	}
-
         } catch (error) {
-          console.log('data consolidation:', error);
-          res.status(500);
+
+          res.render("home.ejs", {
+            profile: profile,
+            setup: startQuestion,
+            preferred_stocks: preferred_stocks,
+            allStocks: allStocks,
+            allQuotes: allQuotes,
+            logos: logos,
+            prices: prices,
+            url: "",
+            currentStocks: currentStocks,
+            countries: countries,
+            currencies: currencies,
+            exchanges: exchanges,
+            currency_quote: currency_quote,
+            currency_base: currency_base,
+            currency_group: currency_group,
+          });
+                     
         }
 
         /* chart config */
