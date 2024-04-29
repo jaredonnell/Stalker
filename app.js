@@ -110,7 +110,7 @@ async function dataExtract(stock_data) {
   let deviation = [];
   let topBand = [];
   let lowBand = [];
- // console.log(stock_data);
+  // console.log(stock_data);
 
   /* mean calc + price storing */
 
@@ -394,25 +394,23 @@ app.post("/login", async (req, res) => {
           let stock_logo = await axios.get(
             `https://api.twelvedata.com/logo?symbol=${currentStocks[i]}&apikey=` +
               api_key
-            //	    (res, err) => {
-            //		if (err) {
-            //			stock_logo = null;
-            //			res.json(stock_logo.data);
-            //		}
           );
           console.log(stock_logo.data.url);
           console.log(stock_logo.data.status);
 
           let logoProcess = "null";
 
-          if (stock_logo.data.status !== "error" && stock_logo.data.url !== "") {
+          if (
+            stock_logo.data.status !== "error" &&
+            stock_logo.data.url !== ""
+          ) {
             const response = await axios.get(
               `http://localhost:3000/bg-remove?rawURL=${stock_logo.data.url}` // REMOVE BEFORE DEPLOY
             );
             logoProcess = response.data.logo;
-            console.log(logoProcess);
+            // console.log(logoProcess);
           }
-          console.log(logoProcess);
+          // console.log(logoProcess);
 
           logos.push(logoProcess);
 
@@ -421,7 +419,7 @@ app.post("/login", async (req, res) => {
               api_key
           );
 
-          prices.push(realPrice.data);
+          prices.push(realPrice.data.price);
         }
 
         /* data allocation for chart  */
@@ -430,10 +428,12 @@ app.post("/login", async (req, res) => {
         console.log(allStocks.length);
 
         try {
-          await dataExtract(allStocks[0]);
+          // for (const stock of allStocks) {
+            await dataExtract(allStocks[0]);
+          // }
           console.log("chart data sent successfuly");
         } catch (error) {
-
+          console.log("allStocks empty");
           res.render("home.ejs", {
             profile: profile,
             setup: startQuestion,
@@ -451,151 +451,151 @@ app.post("/login", async (req, res) => {
             currency_base: currency_base,
             currency_group: currency_group,
           });
-                     
+          return;
         }
 
         /* chart config */
 
         const chart = new QuickChart();
-        await chart.setConfig({
-          type: "ohlc",
-          data: {
-            datasets: [
-              {
-                yAxisID: "y1",
-                data: allStocks[0].chartData[0].values.map(
-                  ([d, o, h, l, c]) => ({
+        for (const stock of allStocks) {
+          await chart.setConfig({
+            type: "ohlc",
+            data: {
+              datasets: [
+                {
+                  yAxisID: "y1",
+                  data: stock.chartData[0].values.map(([d, o, h, l, c]) => ({
                     t: new Date(d).getTime(),
                     o,
                     h,
                     l,
                     c,
-                  })
-                ),
-                color: {
-                  up: "rgb(98, 236, 98)",
-                  down: "rgb(255,106,106)",
-                  unchanged: "white",
-                },
-              },
-              {
-                type: "bar",
-                yAxisID: "y2",
-                backgroundColor: "pink",
-                label: "Volume",
-                data: allStocks[0].chartData[1].values.map(([d, y]) => ({
-                  x: new Date(d).getTime(),
-                  y,
-                })),
-              },
-              {
-                type: "line",
-                yAxisID: "y1",
-                borderColor: "pink",
-                backgroundColor: "",
-                borderWidth: 2,
-                pointRadius: 0,
-                label: "SMA",
-                data: allStocks[0].chartData[2].map(([d, y]) => ({
-                  x: new Date(d).getTime(),
-                  y,
-                })),
-              },
-              {
-                type: "line",
-                yAxisID: "y1",
-                borderColor: "rgba(103, 103, 255, 0.822)",
-                backgroundColor: "",
-                borderWidth: 2,
-                pointRadius: 0,
-                label: "Upper Band",
-                data: allStocks[0].chartData[3].map(([d, y]) => ({
-                  x: new Date(d).getTime(),
-                  y,
-                })),
-              },
-              {
-                type: "line",
-                yAxisID: "y1",
-                borderColor: "rgba(255, 255, 137, 0.801)",
-                backgroundColor: "",
-                borderWidth: 2,
-                pointRadius: 0,
-                label: "Lower Band",
-                data: allStocks[0].chartData[4].map(([d, y]) => ({
-                  x: new Date(d).getTime(),
-                  y,
-                })),
-              },
-            ],
-          },
-          options: {
-            scales: {
-              x: {
-                adapters: {
-                  date: {
-                    zone: "UTC-4",
+                  })),
+                  color: {
+                    up: "rgb(98, 236, 98)",
+                    down: "rgb(255,106,106)",
+                    unchanged: "white",
                   },
                 },
-                grid: {
-                  display: false,
+                {
+                  type: "bar",
+                  yAxisID: "y2",
+                  backgroundColor: "pink",
+                  label: "Volume",
+                  data: stock.chartData[1].values.map(([d, y]) => ({
+                    x: new Date(d).getTime(),
+                    y,
+                  })),
                 },
-                time: {
-                  unit: "day",
-                  stepSize: 1,
-                  displayFormats: {
-                    day: "MMM d",
-                    month: "MMM d",
+                {
+                  type: "line",
+                  yAxisID: "y1",
+                  borderColor: "pink",
+                  backgroundColor: "",
+                  borderWidth: 2,
+                  pointRadius: 0,
+                  label: "SMA",
+                  data: stock.chartData[2].map(([d, y]) => ({
+                    x: new Date(d).getTime(),
+                    y,
+                  })),
+                },
+                {
+                  type: "line",
+                  yAxisID: "y1",
+                  borderColor: "rgba(103, 103, 255, 0.822)",
+                  backgroundColor: "",
+                  borderWidth: 2,
+                  pointRadius: 0,
+                  label: "Upper Band",
+                  data: stock.chartData[3].map(([d, y]) => ({
+                    x: new Date(d).getTime(),
+                    y,
+                  })),
+                },
+                {
+                  type: "line",
+                  yAxisID: "y1",
+                  borderColor: "rgba(255, 255, 137, 0.801)",
+                  backgroundColor: "",
+                  borderWidth: 2,
+                  pointRadius: 0,
+                  label: "Lower Band",
+                  data: stock.chartData[4].map(([d, y]) => ({
+                    x: new Date(d).getTime(),
+                    y,
+                  })),
+                },
+              ],
+            },
+            options: {
+              scales: {
+                x: {
+                  adapters: {
+                    date: {
+                      zone: "UTC-4",
+                    },
+                  },
+                  grid: {
+                    display: false,
+                  },
+                  time: {
+                    unit: "day",
+                    stepSize: 1,
+                    displayFormats: {
+                      day: "MMM d",
+                      month: "MMM d",
+                    },
+                  },
+                  ticks: {
+                    display: false,
                   },
                 },
-                ticks: {
-                  display: false,
-                },
-              },
-              y1: {
-                stack: "stockChart",
-                stackWeight: 10000000,
-                weight: 2,
-                grace: "50%",
-                grid: {
-                  display: false,
-                },
-                ticks: {
-                  display: true,
-                  font: {
-                    size: 10,
+                y1: {
+                  stack: "stockChart",
+                  stackWeight: 10000000,
+                  weight: 2,
+                  grace: "50%",
+                  grid: {
+                    display: false,
                   },
-                  padding: 0,
+                  ticks: {
+                    display: true,
+                    font: {
+                      size: 10,
+                    },
+                    padding: 0,
+                  },
+                },
+                y2: {
+                  display: false,
+                  stack: "stockChart",
+                  stackWeight: 1,
+                  weight: 1,
+                  grid: {
+                    display: false,
+                  },
+                  ticks: {
+                    display: false,
+                  },
                 },
               },
-              y2: {
-                display: false,
-                stack: "stockChart",
-                stackWeight: 1,
-                weight: 1,
-                grid: {
+              plugins: {
+                legend: {
                   display: false,
                 },
-                ticks: {
+                title: {
                   display: false,
                 },
               },
             },
             plugins: {
-              legend: {
-                display: false,
-              },
-              title: {
-                display: false,
+              tooltip: {
+                enabled: false,
               },
             },
-          },
-          plugins: {
-            tooltip: {
-              enabled: false,
-            },
-          },
-        });
+          });
+        }
 
         await chart
           .setVersion("3.4.0")

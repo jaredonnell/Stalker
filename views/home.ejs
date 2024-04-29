@@ -283,10 +283,16 @@
           <h1><%= profile[0].stock_pref %></h1>
         </div>
 
-        <!--cards-->
+      <!--cards-->
+        
+      <% if (allStocks.length == 0) { %>
+
+          <h1 class="jost-head">Gathering data...</h1>
+
+      <% } %>
 
       <div class="card-wrap hide">
-        <% for (let i = 0; i < currentStocks.length; i++) { %>
+        <% for (let i = 0; i < allStocks.length; i++) { %>
         <div class="favorite">
           <p class="jost">+ Favorite</p>
         </div>
@@ -301,7 +307,7 @@
             </div>
             <div class="change">
               <h3 class="jost"><%= allQuotes[i].percent_change %>%</h3>
-              <h3 class="jost"><%= prices[i] %></h3>
+              <h3 class="jost">$<%= prices[i] %></h3>
             </div>
             <div class="volume">
               <h3 class="jost">Volume:</h3>
