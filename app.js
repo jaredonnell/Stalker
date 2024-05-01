@@ -388,6 +388,7 @@ app.post("/login", async (req, res) => {
             `https://api.twelvedata.com/quote?symbol=${currentStocks[i]}&interval=30min&dp=3&apikey=` +
               api_key
           );
+	  console.log(stock_quote.data);
 
           allQuotes.push(stock_quote.data);
 
@@ -426,6 +427,7 @@ app.post("/login", async (req, res) => {
 
         console.log(allStocks[0]);
         console.log(allStocks.length);
+	console.log(allQuotes[0]);
 
         try {
           // for (const stock of allStocks) {

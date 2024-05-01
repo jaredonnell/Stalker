@@ -299,7 +299,11 @@
         <div class="card">
           <div class="main">
             <div class="logo">
+	      <% if (logos[i] == "null") { %>
+    	         <img class="logoImage" src="./images/stalker_logo.png" alt="">
+	      <% } else { %>
               <img class="logoImage" src="<%= logos[i] %>" alt="">
+	      <% } %>
             </div>
             <div class="card-title">
               <h3 class="jost-head"><%= allQuotes[i].symbol %></h3>
@@ -544,5 +548,6 @@
       });
 
     </script>
+    <script type='module' src='./scripts/acquisitions.js'></script>
   </body>
 </html>
