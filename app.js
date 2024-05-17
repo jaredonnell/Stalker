@@ -42,7 +42,7 @@ async function select(query, params) {
 
 async function insert(query, params) {
   try {
-    const rows = await new Promise((resolve, rejec) => {
+    const rows = await new Promise((resolve, reject) => {
       db.run(query, params, function (err) {
         if (err) {
           console.log("unable to insert data from database");
@@ -354,7 +354,7 @@ app.post("/login", async (req, res) => {
           currency_group = [...new Set(currency_group)];
         }
 
-        /* API calls */
+        /* API calls for inital cards */
 
         let currentStocks = [];
         for (let i = 0; i < 3; i++) {
@@ -427,7 +427,7 @@ app.post("/login", async (req, res) => {
 
         console.log(allStocks[0]);
         console.log(allStocks.length);
-	console.log(allQuotes[0]);
+    	console.log(allQuotes[0]);
 
         try {
           // for (const stock of allStocks) {
