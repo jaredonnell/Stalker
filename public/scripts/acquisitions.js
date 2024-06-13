@@ -1,23 +1,80 @@
-// import Chart from "chart.js/auto";
 import axios from "axios";
 import * as finance from "chartjs-chart-financial";
 import {chartData} from "./calcFun.js"
-/* NOTE: perform first 2 card builds server-side
-for immediate availability, perform subsequent cards
-from client side for dynamic rendering */
 
-/* function will be needed to build next 2 cards,
-this includes data collection and chart configuration and
-will be seperate from the configuration used for the
-2 intial cards */
+// NOTE: moving all stock12 api calls along with card construction
+// to acquisitions.js. The limiting fsctors of the api require
+// repeatability due to token bottleneck
 
-/* inital 2 datasets */
+let currentStocks = [];
+for (let i = 0; i < 3; i++) {
+    currentStocks.push(
+        preferred_stocks[
+            Math.floor(Math.random() * preferred_stocks.length)
+        ].symbol
+    );
+    i++;
+}
 
-const dataSource = document.querySelector(".option-title");
-const currentStocks = dataSource.dataset.currentStocks;
-const allStocks = dataSource.dataset.allStocks;
+console.log(currentStocks);
+
+const allStocks = [];
+const allQuotes = [];
+const logos = [];
+const prices = [];
+
+for (let i = 0; i < currentStocks.length; i++) {
+    let stock_data = await axios.get(
+        `https://api.twelvedata.com/time_series?symbol=${currentStocks[i]}&interval=1min&outputsize=35&apikey=` +
+        api_key
+    );
+    console.log(stock_data.data.status);
+
+    if (stock_data.data.status === "ok") {
+        allStocks.push(stock_data.data);
+    }
+
+    let stock_quote = await axios.get(
+        `https://api.twelvedata.com/quote?symbol=${currentStocks[i]}&interval=30min&dp=3&apikey=` +
+        api_key
+    );
+    console.log(stock_quote.data);
+
+    allQuotes.push(stock_quote.data);
+
+    let stock_logo = await axios.get(
+        `https://api.twelvedata.com/logo?symbol=${currentStocks[i]}&apikey=` +
+        api_key
+    );
+    console.log(stock_logo.data.url);
+    console.log(stock_logo.data.status);
+
+    let logoProcess = "null";
+
+    if (
+        stock_logo.data.status !== "error" &&
+        stock_logo.data.url !== ""
+    ) {
+        const response = await axios.get(
+            `http://localhost:3000/bg-remove?rawURL=${stock_logo.data.url}` // REMOVE BEFORE DEPLOY
+        );
+        logoProcess = response.data.logo;
+        // console.log(logoProcess);
+    }
+    // console.log(logoProcess);
+
+    logos.push(logoProcess);
+
+    const realPrice = await axios.get(
+        `https://api.twelvedata.com/price?symbol=${currentStocks[i]}&dp=2&apikey=` +
+        api_key
+    );
+
+    prices.push(realPrice.data.price);
+}
 
 /* data handling */
+
 
 
 /* initial card build */
