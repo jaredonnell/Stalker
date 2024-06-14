@@ -6,76 +6,99 @@ import {chartData} from "./calcFun.js"
 // to acquisitions.js. The limiting fsctors of the api require
 // repeatability due to token bottleneck
 
-let currentStocks = [];
-for (let i = 0; i < 3; i++) {
-    currentStocks.push(
-        preferred_stocks[
-            Math.floor(Math.random() * preferred_stocks.length)
-        ].symbol
-    );
-    i++;
+// globals
+const api_key = "46acf3ff0eac49e385eb6e756b7b7e4e";
+const preferred_stocks = document.getElementsByClassName('option-title').datasets('stockPref');
+const displayed_stocks = [];
+
+// data gathering and consolidation. Takes limitations of api into account
+
+function stock_gen() {
+    let currentStocks = [];
+    for (let i = 0; i < 3; i++) {
+        let random_stock = preferred_stocks[Math.floor(Math.random() * preferred_stocks.length)].symbol
+        if (displayed_stocks.includes(random_stock)) {
+            console.log('duplicate stock. repicking');
+            stock_gen();
+        }
+        currentStocks.push(random_stock);
+        i++;
+    }
+    return currentStocks;
 }
 
 console.log(currentStocks);
 
-const allStocks = [];
-const allQuotes = [];
-const logos = [];
-const prices = [];
 
-for (let i = 0; i < currentStocks.length; i++) {
-    let stock_data = await axios.get(
-        `https://api.twelvedata.com/time_series?symbol=${currentStocks[i]}&interval=1min&outputsize=35&apikey=` +
-        api_key
-    );
-    console.log(stock_data.data.status);
+// takes the set of random stocks and gathers all available data,
+// returning them in an object
+async function data_construct(currentStocks) {
+    const allStocks = [];
+    const allQuotes = [];
+    const logos = [];
+    const prices = [];
 
-    if (stock_data.data.status === "ok") {
-        allStocks.push(stock_data.data);
-    }
-
-    let stock_quote = await axios.get(
-        `https://api.twelvedata.com/quote?symbol=${currentStocks[i]}&interval=30min&dp=3&apikey=` +
-        api_key
-    );
-    console.log(stock_quote.data);
-
-    allQuotes.push(stock_quote.data);
-
-    let stock_logo = await axios.get(
-        `https://api.twelvedata.com/logo?symbol=${currentStocks[i]}&apikey=` +
-        api_key
-    );
-    console.log(stock_logo.data.url);
-    console.log(stock_logo.data.status);
-
-    let logoProcess = "null";
-
-    if (
-        stock_logo.data.status !== "error" &&
-        stock_logo.data.url !== ""
-    ) {
-        const response = await axios.get(
-            `http://localhost:3000/bg-remove?rawURL=${stock_logo.data.url}` // REMOVE BEFORE DEPLOY
+    for (let i = 0; i < currentStocks.length; i++) {
+        let stock_data = await axios.get(
+            `https://api.twelvedata.com/time_series?symbol=${currentStocks[i]}&interval=1min&outputsize=35&apikey=` +
+            api_key
         );
-        logoProcess = response.data.logo;
-        // console.log(logoProcess);
+        console.log(stock_data.data.status);
+
+        if (stock_data.data.status === "ok") {
+            allStocks.push(stock_data.data);
+        }
+
+        let stock_quote = await axios.get(
+            `https://api.twelvedata.com/quote?symbol=${currentStocks[i]}&interval=30min&dp=3&apikey=` +
+            api_key
+        );
+        console.log(stock_quote.data);
+
+        allQuotes.push(stock_quote.data);
+
+        let stock_logo = await axios.get(
+            `https://api.twelvedata.com/logo?symbol=${currentStocks[i]}&apikey=` +
+            api_key
+        );
+        console.log(stock_logo.data.url);
+        console.log(stock_logo.data.status);
+
+        let logoProcess = "null";
+
+        if (
+            stock_logo.data.status !== "error" &&
+            stock_logo.data.url !== ""
+        ) {
+            const response = await axios.get(
+                `http://localhost:3000/bg-remove?rawURL=${stock_logo.data.url}` // REMOVE BEFORE DEPLOY
+            );
+            logoProcess = response.data.logo;
+        }
+
+        logos.push(logoProcess);
+
+        const realPrice = await axios.get(
+            `https://api.twelvedata.com/price?symbol=${currentStocks[i]}&dp=2&apikey=` +
+            api_key
+        );
+
+        prices.push(realPrice.data.price);
     }
-    // console.log(logoProcess);
-
-    logos.push(logoProcess);
-
-    const realPrice = await axios.get(
-        `https://api.twelvedata.com/price?symbol=${currentStocks[i]}&dp=2&apikey=` +
-        api_key
-    );
-
-    prices.push(realPrice.data.price);
+    return {allStocks: allStocks, allQuotes: allQuotes, prices: prices, logos: logos};
 }
 
 /* data handling */
 
+let limit = 4
 
+async function data_consolidate() {
+    let token_count = 0
+    let currentStocks = await stock_gen();
+
+    let current_data = await data_construct(currentStocks);
+
+}
 
 /* initial card build */
 

@@ -9,7 +9,6 @@ import sharp from "sharp";
 
 const app = express();
 const port = 3000;
-const api_key = "46acf3ff0eac49e385eb6e756b7b7e4e";
 let check = true;
 
 const db = new sqlite3.Database("./data/stalker.db", (err) => {

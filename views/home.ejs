@@ -279,18 +279,14 @@
 
         <% } %>
 
-        <div class="option-title jost-head" data-currentStocks="<%= currentStocks %>" data-allStocks="<%= allStocks %>" >
+        <div class="option-title jost-head" data-stockPref=<%= preferred_stocks %> >
           <h1><%= profile[0].stock_pref %></h1>
         </div>
 
       <!--cards-->
+
+      <!--Left card skeleton in for reference-->
         
-      <% if (allStocks.length == 0) { %>
-
-          <h1 class="jost-head">Gathering data...</h1>
-
-      <% } %>
-
       <div class="card-wrap hide">
         <% for (let i = 0; i < allStocks.length; i++) { %>
         <div class="favorite">
