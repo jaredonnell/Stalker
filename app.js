@@ -21,23 +21,23 @@ const db = new sqlite3.Database("./data/stalker.db", (err) => {
 
 /* db interactions */
 
-    async function select(query, params) {
-        try {
-            const rows = await new Promise((resolve, reject) => {
-                db.all(query, params, (err, rows) => {
-                    if (err) {
-                        console.log("unable to access data from database");
-                        reject(err);
-                    } else {
-                        resolve(rows);
-                    }
-                });
+async function select(query, params) {
+    try {
+        const rows = await new Promise((resolve, reject) => {
+            db.all(query, params, (err, rows) => {
+                if (err) {
+                    console.log("unable to access data from database");
+                    reject(err);
+                } else {
+                    resolve(rows);
+                }
             });
-            return rows;
-        } catch (err) {
-            console.error(err);
-        }
+        });
+        return rows;
+    } catch (err) {
+        console.error(err);
     }
+}
 
 async function insert(query, params) {
     try {
@@ -98,13 +98,13 @@ async function slowSelect(batchSize, userPref) {
 
 /* middleware */
 
-    app.use(
-        session({
-            secret: "aniamtedCrutons486",
-            resave: false,
-            saveUninitialized: true,
-        })
-    );
+app.use(
+    session({
+        secret: "aniamtedCrutons486",
+        resave: false,
+        saveUninitialized: true,
+    })
+);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
@@ -112,9 +112,9 @@ app.use(express.static("public"));
 
 /* lander */
 
-    app.get("/", async (req, res) => {
-        res.render("index.ejs", { name_taken: "" });
-    });
+app.get("/", async (req, res) => {
+    res.render("index.ejs", { name_taken: "" });
+});
 
 app.post("/sign-up", async (req, res) => {
     const db = new sqlite3.Database("./data/stalker.db", (err) => {
@@ -194,110 +194,78 @@ app.post("/login", async (req, res) => {
 
         /* insert data into profile table as needed */
 
-            if (exists === true) {
-                const profile = await select(
-                    "SELECT * FROM profile WHERE username = ($1)",
-                    [req.body.username]
+        if (exists === true) {
+            const profile = await select(
+                "SELECT * FROM profile WHERE username = ($1)",
+                [req.body.username]
+            );
+
+            if (profile[0].stock_pref !== null) {
+                const preferred_stocks = await slowSelect(
+                    25000,
+                    profile[0].stock_pref.toLowerCase()
                 );
 
-                if (profile[0].stock_pref !== null) {
-                    const preferred_stocks = await slowSelect(
-                        25000,
-                        profile[0].stock_pref.toLowerCase()
-                    );
+                /* filter options config */
 
-                    /* filter options config */
+                let countries = [];
+                let exchanges = [];
+                let currencies = [];
+                let currency_base = [];
+                let currency_quote = [];
+                let currency_group = [];
 
-                    let countries = [];
-                    let exchanges = [];
-                    let currencies = [];
-                    let currency_base = [];
-                    let currency_quote = [];
-                    let currency_group = [];
-
-                    if (
-                        profile[0].stock_pref === "Equities" ||
+                if (
+                    profile[0].stock_pref === "Equities" ||
                         profile[0].stock_pref === "Index" ||
                         profile[0].stock_pref === "ETFs"
-                    ) {
-                        for (let i = 0; i < preferred_stocks.length; i++) {
-                            countries.push(preferred_stocks[i].country);
-                            exchanges.push(preferred_stocks[i].exchange);
-                            currencies.push(preferred_stocks[i].currency);
-                        }
-
-                        countries = [...new Set(countries)];
-                        currencies = [...new Set(currencies)];
-                        exchanges = [...new Set(exchanges)];
-                    } else if (profile[0].stock_pref === "Crypto") {
-                        for (let i = 0; i < preferred_stocks.length; i++) {
-                            currency_base.push(preferred_stocks[i].currency_base);
-                            currency_quote.push(preferred_stocks[i].currency_quote);
-                        }
-
-                        currency_base = [...new Set(currency_base)];
-                        currency_quote = [...new Set(currency_quote)];
-                    } else if (profile[0].stock_pref === "Forex") {
-                        for (let i = 0; i < preferred_stocks.length; i++) {
-                            currency_base.push(preferred_stocks[i].currency_base);
-                            currency_group.push(preferred_stocks[i].currency_group);
-                        }
-
-                        currency_base = [...new Set(currency_base)];
-                        currency_group = [...new Set(currency_group)];
+                ) {
+                    for (let i = 0; i < preferred_stocks.length; i++) {
+                        countries.push(preferred_stocks[i].country);
+                        exchanges.push(preferred_stocks[i].exchange);
+                        currencies.push(preferred_stocks[i].currency);
                     }
 
-                    res.render("home.ejs", {
-                        profile: profile,
-                        setup: startQuestion,
-                        preferred_stocks: preferred_stocks,
-                        allStocks: allStocks,
-                        allQuotes: allQuotes,
-                        logos: logos,
-                        prices: prices,
-                        url: url,
-                        currentStocks: currentStocks,
-                        countries: countries,
-                        currencies: currencies,
-                        exchanges: exchanges,
-                        currency_quote: currency_quote,
-                        currency_base: currency_base,
-                        currency_group: currency_group,
-                    });
-                } else {
-                    startQuestion = true;
-                    res.render("home.ejs", {
-                        profile: profile,
-                        setup: startQuestion,
-                        preferred_stocks: preferred_stocks,
-                        stock_data: stock_data.data,
-                        stock_quote: stock_quote.data,
-                        logoURL: logoProcess.data.logo,
-                        realPrice: realPrice.data.price,
-                        url: url,
-                        stocks: stocks,
-                        countries: countries,
-                        currencies: currencies,
-                        exchanges: exchanges,
-                        currency_quote: currency_quote,
-                        currency_base: currency_base,
-                        currency_group: currency_group,
-                    });
+                    countries = [...new Set(countries)];
+                    currencies = [...new Set(currencies)];
+                    exchanges = [...new Set(exchanges)];
+                } else if (profile[0].stock_pref === "Crypto") {
+                    for (let i = 0; i < preferred_stocks.length; i++) {
+                        currency_base.push(preferred_stocks[i].currency_base);
+                        currency_quote.push(preferred_stocks[i].currency_quote);
+                        }
+
+                    currency_base = [...new Set(currency_base)];
+                    currency_quote = [...new Set(currency_quote)];
+                } else if (profile[0].stock_pref === "Forex") {
+                    for (let i = 0; i < preferred_stocks.length; i++) {
+                        currency_base.push(preferred_stocks[i].currency_base);
+                        currency_group.push(preferred_stocks[i].currency_group);
+                    }
+
+                    currency_base = [...new Set(currency_base)];
+                    currency_group = [...new Set(currency_group)];
                 }
 
-                console.log("yup");
+                res.render("home.ejs", {
+                    profile: profile,
+                    setup: startQuestion,
+                    preferred_stocks: preferred_stocks,
+                    allStocks: allStocks,
+                    allQuotes: allQuotes,
+                    logos: logos,
+                    prices: prices,
+                    url: url,
+                    currentStocks: currentStocks,
+                    countries: countries,
+                    currencies: currencies,
+                    exchanges: exchanges,
+                    currency_quote: currency_quote,
+                    currency_base: currency_base,
+                    currency_group: currency_group,
+                });
             } else {
                 startQuestion = true;
-
-                await insert("INSERT INTO profile (username) VALUES ($1)", [
-                    req.body.username,
-                ]);
-
-                const profile = await select(
-                    "SELECT * FROM profile WHERE username = ($1)",
-                    [req.body.username]
-                );
-
                 res.render("home.ejs", {
                     profile: profile,
                     setup: startQuestion,
@@ -316,6 +284,38 @@ app.post("/login", async (req, res) => {
                     currency_group: currency_group,
                 });
             }
+
+            console.log("yup");
+        } else {
+            startQuestion = true;
+
+            await insert("INSERT INTO profile (username) VALUES ($1)", [
+                req.body.username,
+            ]);
+
+            const profile = await select(
+                "SELECT * FROM profile WHERE username = ($1)",
+                [req.body.username]
+            );
+
+            res.render("home.ejs", {
+                profile: profile,
+                setup: startQuestion,
+                preferred_stocks: preferred_stocks,
+                stock_data: stock_data.data,
+                stock_quote: stock_quote.data,
+                logoURL: logoProcess.data.logo,
+                realPrice: realPrice.data.price,
+                url: url,
+                stocks: stocks,
+                countries: countries,
+                currencies: currencies,
+                exchanges: exchanges,
+                currency_quote: currency_quote,
+                currency_base: currency_base,
+                currency_group: currency_group,
+            });
+        }
     } else {
         /* auth fail */
 
@@ -362,8 +362,8 @@ app.get("/bg-remove", async (req, res) => {
             const proccessedImage = await sharp(data, { raw: info }).png().toBuffer();
 
             const proccessedURL = `data:image/png;base64,${proccessedImage.toString(
-                "base64"
-            )}`;
+"base64"
+)}`;
 
             return proccessedURL;
         } catch (error) {
@@ -423,7 +423,7 @@ app.post("/user-setup", async (req, res) => {
 
     /* insert form data */
 
-        console.log(req.body.name);
+    console.log(req.body.name);
 
     const update = await insert(
         "UPDATE profile SET name = $1, stock_pref = $2 WHERE username = $3 ",
@@ -432,9 +432,9 @@ app.post("/user-setup", async (req, res) => {
 
     /* grab user profile */
 
-        const profile = await select("SELECT * FROM profile WHERE username = ($1)", [
-            username,
-        ]);
+    const profile = await select("SELECT * FROM profile WHERE username = ($1)", [
+        username,
+    ]);
 
     const preferred_stocks = await select(
         `SELECT * FROM ${profile[0].stock_pref.toLowerCase()}`
@@ -442,7 +442,7 @@ app.post("/user-setup", async (req, res) => {
 
     /* filter options config */
 
-        let countries = [];
+    let countries = [];
     let exchanges = [];
     let currencies = [];
     let currency_base = [];
@@ -451,8 +451,8 @@ app.post("/user-setup", async (req, res) => {
 
     if (
         profile[0].stock_pref === "Equities" ||
-        profile[0].stock_pref === "Index" ||
-        profile[0].stock_pref === "ETFs"
+            profile[0].stock_pref === "Index" ||
+            profile[0].stock_pref === "ETFs"
     ) {
         for (let i = 0; i < preferred_stocks.length; i++) {
             countries.push(preferred_stocks[i].country);
